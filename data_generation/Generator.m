@@ -3,7 +3,7 @@ classdef Generator
         num_signals
         num_data_points
         num_components_range
-        sampling_freq % TODO: check realistic values
+        sampling_freq
         freq_range
         amplitude_range
         phase_range
@@ -42,12 +42,21 @@ classdef Generator
             theta = unifrnd(obj.phase_range(1), obj.phase_range(2));
             signal = amplitude * sin(2 * pi * freqHz * t + theta);
         end
+
+        function component = convert_component_to_intermittent(obj, component)
+            active_samples = randi([obj.num_data_points / 10, obj.num_data_points / 2]);
+            if rand() < 0.5
+                component(1:active_samples) = 0;
+            else
+                component(active_samples+1:end) = 0;
+            end
+        end
         
         function all_components = get_decomposed_signal(obj)
             num_components = randi(obj.num_components_range);
             all_components = zeros(num_components, obj.num_data_points);
             all_frequencies = zeros(num_components, 1);
-            MIN_FREQUENCY_DIFFERENCE = 0.5;
+            MIN_FREQUENCY_DIFFERENCE = 0.2;
             MAX_NARROW_FREQUENCY_DIFFERENCE = 0.25;
         
             for i = 1:num_components
@@ -60,12 +69,13 @@ classdef Generator
                 while generate_new_component
                     [component, new_freq_hz] = obj.get_random_sinusoid(obj.freq_range, randi(2^31 - 1));
                     generate_attempts = generate_attempts + 1;
-        
+                    
                     if generate_attempts > 100
+                        disp("HEY")
                         all_components = [];
                         return;
                     end
-        
+                    
                     generate_new_component = false;
                     for j = 1:length(all_frequencies)
                         if abs(new_freq_hz - all_frequencies(j)) < max(all_frequencies(j), new_freq_hz) * MIN_FREQUENCY_DIFFERENCE
@@ -78,24 +88,19 @@ classdef Generator
                         current_frequencies = [current_frequencies; new_freq_hz];
                     end
                 end
-        
+                
                 if generate_combined % TODO: I think there is something wrong here...
                     [additional_component, additional_freq] = obj.get_random_sinusoid([new_freq_hz * (1 - MAX_NARROW_FREQUENCY_DIFFERENCE), new_freq_hz * (1 + MAX_NARROW_FREQUENCY_DIFFERENCE)], randi(2^31 - 1));
                     component = component + additional_component;
                     current_frequencies = [current_frequencies; additional_freq];
                     allow_combined = obj.allow_multiple_combined;
                 end
-        
+                
                 if ~generate_new_component && generate_intermittent
-                    active_samples = randi([obj.num_data_points / 10, obj.num_data_points / 2]);
-                    if rand() < 0.5
-                        component(1:active_samples) = 0;
-                    else
-                        component(active_samples+1:end) = 0;
-                    end
+                    component = obj.convert_component_to_intermittent(component);
                     allow_intermittent = obj.allow_multiple_intermittent;
                 end
-                
+
                 all_components(i, :) = component;
                 all_frequencies(i) = max(current_frequencies);
             end
@@ -104,8 +109,10 @@ classdef Generator
             all_components = all_components(idx, :);
         end
         
-        
-        function [original_components, combined_signals] = generate_dataset(obj)
+        function [original_components, combined_signals] = generate_dataset(obj, additional_component_frequency_range)
+            if nargin < 2 || isempty(additional_component_frequency_range)
+                additional_component_frequency_range = 0;
+            end
             combined_signals = zeros(obj.num_signals, obj.num_data_points);
             original_components = cell(obj.num_signals, 1);
             rng(obj.random_state);
@@ -114,6 +121,11 @@ classdef Generator
                 freq_comp_pairs = obj.get_decomposed_signal();
                 original_components{i} = freq_comp_pairs;
                 composed_signal = sum(freq_comp_pairs, 1);
+                if additional_component_frequency_range ~= 0
+                    [additional_component, ~] = obj.get_random_sinusoid(additional_component_frequency_range, randi(2^31 - 1));
+                    additional_component = obj.convert_component_to_intermittent(additional_component);
+                    composed_signal = composed_signal + additional_component;
+                end
                 combined_signals(i, :) = composed_signal;
                 if mod(i, 100) == 0
                     disp(["Generated signal ", num2str(i), "/", num2str(obj.num_signals)]);
