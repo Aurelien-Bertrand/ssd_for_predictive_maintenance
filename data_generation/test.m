@@ -21,6 +21,10 @@ allow_multiple_combined = true;
 % TODO: 4. make the algorithm online (constantly generating and analysing data)
 
 obj = Generator(num_signals, num_data_points, num_components_range, sampling_freq, freq_range, amplitude_range, phase_range, random_state, intermittent_prob, combined_prob, allow_intermittent, allow_combined, allow_multiple_intermittent, allow_multiple_combined);
-[components, signals, fault_flags] = obj.generate_dataset([500 500]);
+dataset = obj.generate_dataset([500 500]);
 
-plot_raw_signals(signals)
+% dataset.save();
+
+% dataset = Dataset.load();
+
+plot_raw_signals(dataset.signals)

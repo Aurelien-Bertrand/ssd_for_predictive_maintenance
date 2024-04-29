@@ -32,6 +32,8 @@ classdef Generator
             obj.allow_combined = allow_combined;
             obj.allow_multiple_intermittent = allow_multiple_intermittent;
             obj.allow_multiple_combined = allow_multiple_combined;
+
+            addpath("./data_generation/")
         end
 
         function [signal, freqHz] = get_random_sinusoid(obj, freq_range, random_state)
@@ -111,7 +113,7 @@ classdef Generator
             all_components = all_components(idx, :);
         end
         
-        function [original_components, combined_signals, fault_flags] = generate_dataset(obj, additional_component_frequency_range, probability)
+        function dataset = generate_dataset(obj, additional_component_frequency_range, probability)
             if nargin < 2 || isempty(additional_component_frequency_range)
                 additional_component_frequency_range = 0;
             end
@@ -139,8 +141,9 @@ classdef Generator
                     composed_signal = composed_signal + additional_component;
                     fault_flags(i) = true;
                 end
-                combined_signals(i, 1:end) = composed_signal;
+                combined_signals(i, :) = composed_signal;
             end
+            dataset = Dataset(obj, original_components, combined_signals, fault_flags);
         end
     end
 end
