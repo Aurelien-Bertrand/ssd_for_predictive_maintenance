@@ -43,9 +43,12 @@ classdef Generator
             signal = amplitude * sin(2 * pi * freqHz * t + theta);
         end
 
-        function component = convert_component_to_intermittent(obj, component)
+        function component = convert_component_to_intermittent(obj, component, include_end)
+            if nargin < 3 || isempty(include_end)
+                include_end = false;
+            end
             active_samples = randi([obj.num_data_points / 10, obj.num_data_points / 2]);
-            if rand() < 0.5
+            if include_end || rand() < 0.5
                 component(1:active_samples) = 0;
             else
                 component(active_samples+1:end) = 0;
@@ -71,7 +74,6 @@ classdef Generator
                     generate_attempts = generate_attempts + 1;
                     
                     if generate_attempts > 100
-                        disp("HEY")
                         all_components = [];
                         return;
                     end
@@ -109,27 +111,35 @@ classdef Generator
             all_components = all_components(idx, :);
         end
         
-        function [original_components, combined_signals] = generate_dataset(obj, additional_component_frequency_range)
+        function [original_components, combined_signals, fault_flags] = generate_dataset(obj, additional_component_frequency_range, probability)
             if nargin < 2 || isempty(additional_component_frequency_range)
                 additional_component_frequency_range = 0;
             end
-            combined_signals = zeros(obj.num_signals, obj.num_data_points);
+            if nargin < 3 || isempty(probability)
+                if additional_component_frequency_range ~= 0
+                    probability = 0.5;
+                else
+                    probability = 0;
+                end
+            end
+
             original_components = cell(obj.num_signals, 1);
+            combined_signals = zeros(obj.num_signals, obj.num_data_points);
+            fault_flags = zeros(obj.num_signals, 1);
             rng(obj.random_state);
-            
+
             for i = 1:obj.num_signals
                 freq_comp_pairs = obj.get_decomposed_signal();
                 original_components{i} = freq_comp_pairs;
                 composed_signal = sum(freq_comp_pairs, 1);
-                if additional_component_frequency_range ~= 0
+                fault_flags(i) = false;
+                if rand() < probability
                     [additional_component, ~] = obj.get_random_sinusoid(additional_component_frequency_range, randi(2^31 - 1));
-                    additional_component = obj.convert_component_to_intermittent(additional_component);
+                    additional_component = obj.convert_component_to_intermittent(additional_component, true);
                     composed_signal = composed_signal + additional_component;
+                    fault_flags(i) = true;
                 end
-                combined_signals(i, :) = composed_signal;
-                if mod(i, 100) == 0
-                    disp(["Generated signal ", num2str(i), "/", num2str(obj.num_signals)]);
-                end
+                combined_signals(i, 1:end) = composed_signal;
             end
         end
     end
