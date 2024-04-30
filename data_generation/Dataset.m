@@ -1,6 +1,8 @@
 classdef Dataset
     properties (Constant, Access = private)
-        CACHE_PATH = "./cache/dataset.mat"
+        CACHE_PATH = "./cache/"
+        DATASET_PATH = strcat(Dataset.CACHE_PATH, "dataset.mat")
+        DATA_PATH = strcat(Dataset.CACHE_PATH, "data.mat")
     end
 
     properties
@@ -19,7 +21,12 @@ classdef Dataset
         end
 
         function save(obj)
-            save(obj.CACHE_PATH, "obj");
+            save(obj.DATASET_PATH, "obj");
+        end
+
+        function save_data(obj)
+            data = [obj.signals obj.fault_flags];
+            save(obj.DATA_PATH, "data")
         end
     end
 
