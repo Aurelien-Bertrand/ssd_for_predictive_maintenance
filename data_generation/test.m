@@ -1,7 +1,7 @@
 addpath("plotting")
 
-num_signals = 10;
-num_data_points = 5000;
+num_signals = 50000;
+num_data_points = 1000;
 num_components_range = [5 5]; % TODO: play with this
 sampling_freq = 1000; % TODO: check realistic values -- for us
 freq_range = [2 100]; % TODO: check realistic values -- for us
@@ -25,7 +25,25 @@ dataset = obj.generate_dataset([500 500]);
 % Save dataset if needed
 % dataset.save();
 
+
 % Can load the dataset instead of generating from scratch
 % dataset = Dataset.load();
 
-plot_raw_signals(dataset.signals)
+% plot_raw_signals(dataset.signals)
+
+
+
+
+
+% SAVING DATASET TO CSV
+
+% Convert dataset to table
+data = dataset.signals;
+ys = dataset.fault_flags;
+data = cat(2, data, ys);
+
+data = array2table(data);
+
+% Save table to CSV file
+path = './NeuralNet/data.csv'; 
+writetable(data, path);

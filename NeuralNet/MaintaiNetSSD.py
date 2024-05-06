@@ -13,22 +13,22 @@ from tqdm import tqdm
 PRINTER = False
 PATIENCE = 3
 
-class MaintainNet(nn.Module):
+class MaintainNetSSD(nn.Module):
     def __init__(self, name, num_classes):
-        super(MaintainNet, self).__init__()
+        super(MaintainNetSSD, self).__init__()
         self.name = name
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print(f"Using device: {self.device}")
 
         # Define convolutional layers
         self.conv_layers = nn.ModuleList([
-            nn.Conv1d(in_channels=1, out_channels=16, kernel_size=64, padding=32),  # Adjusted padding
-            nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, padding=1),    # Adjusted padding
-            nn.Conv1d(in_channels=32, out_channels=64, kernel_size=3, padding=1),    # Adjusted padding
-            nn.Conv1d(in_channels=64, out_channels=64, kernel_size=3, padding=1),   # Adjusted padding
-            nn.Conv1d(in_channels=64, out_channels=32, kernel_size=3, padding=1),   # Adjusted padding
-            nn.Conv1d(in_channels=32, out_channels=16, kernel_size=3, padding=1),    # Adjusted padding
-            nn.Conv1d(in_channels=16, out_channels=1, kernel_size=3, padding=1),    # Adjusted padding
+            nn.Conv1d(in_channels=8, out_channels=16, kernel_size=64, padding=32),  # Initial layer for multiple channels
+            nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, padding=1),
+            nn.Conv1d(in_channels=32, out_channels=64, kernel_size=3, padding=1),
+            nn.Conv1d(in_channels=64, out_channels=64, kernel_size=3, padding=1),
+            nn.Conv1d(in_channels=64, out_channels=32, kernel_size=3, padding=1),
+            nn.Conv1d(in_channels=32, out_channels=16, kernel_size=3, padding=1),
+            nn.Conv1d(in_channels=16, out_channels=1, kernel_size=3, padding=1),  # Final layer to reduce channels
         ])
 
         # Define batch normalization layers
@@ -36,8 +36,13 @@ class MaintainNet(nn.Module):
             nn.BatchNorm1d(num_features=x.out_channels) for x in self.conv_layers
         ])
 
+        # Assuming the last convolutional layer outputs at 500 time steps due to max pooling
+        final_time_steps = 1000  # Start with the initial time steps
+        for _ in range(len(self.conv_layers)):  # Calculating the size after each pooling
+            final_time_steps = (final_time_steps + 1) // 2  # Adjusting for each pooling layer
+
         # Calculate size for the linear layer to match the output size of the last convolutional layer
-        self.linear_input_size = 7
+        self.linear_input_size = final_time_steps * 1  # Adjusted for number of output channels from the last conv layer
 
         # Define the linear layer
         self.classifier = nn.Linear(self.linear_input_size, num_classes)
@@ -53,7 +58,7 @@ class MaintainNet(nn.Module):
             x = F.max_pool1d(x, kernel_size=2, stride=2)  # Adjusted max pooling stride
 
         # Flatten the output for the linear layer
-        # x = x.view(x.size(0), -1)  # Flatten
+        x = x.view(x.size(0), -1)  # Flatten
 
         # Classifier
         x = self.classifier(x)
