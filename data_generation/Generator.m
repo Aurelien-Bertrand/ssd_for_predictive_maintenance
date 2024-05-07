@@ -56,8 +56,8 @@ classdef Generator
             components = cell(obj.num_signals, 1);
             signals = zeros(obj.num_signals, obj.num_data_points);
             fault_flags = false(obj.num_signals, 1);
-        
-            for i = 1:obj.num_signals
+            
+            parfor i = 1:obj.num_signals
                 freq_comp_pairs = obj.generate_signal();
                 components{i} = freq_comp_pairs;
                 composed_signal = sum(freq_comp_pairs, 1);
@@ -106,7 +106,7 @@ classdef Generator
             num_components = randi(obj.num_components_range);
             components = zeros(num_components, obj.num_data_points);
             frequencies = zeros(num_components, 1);
-        
+            
             for i = 1:num_components
                 generate_new_component = true;
                 generate_attempts = 0;

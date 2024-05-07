@@ -2,7 +2,7 @@ classdef Dataset
     properties (Constant, Access = private)
         CACHE_PATH = "./cache/"
         DATASET_PATH = strcat(Dataset.CACHE_PATH, "dataset.mat")
-        DATA_PATH = strcat(Dataset.CACHE_PATH, "data.mat")
+        DATA_PATH = strcat(Dataset.CACHE_PATH, "data.csv")
     end
 
     properties
@@ -21,19 +21,24 @@ classdef Dataset
         end
 
         function save(obj)
-            save(obj.DATASET_PATH, "obj");
+            save(obj.DATASET_PATH, "obj", "-v7.3");
         end
 
         function save_data(obj)
-            data = [obj.signals obj.fault_flags];
-            save(obj.DATA_PATH, "data")
+            data = array2table([obj.signals obj.fault_flags]);
+            save(obj.DATA_PATH, "data");
         end
     end
 
     methods (Static)
         function dataset = load()
-            dataset = load(Dataset.CACHE_PATH);
-            dataset = dataset.obj;
+            file_name = Dataset.DATASET_PATH;
+            if isfile(file_name)
+                dataset = load(file_name);
+                dataset = dataset.obj;
+            else
+                dataset = [];
+            end
         end
     end
 end

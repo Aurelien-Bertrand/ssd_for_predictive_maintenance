@@ -19,31 +19,22 @@ allow_multiple_combined = true;
 % TODO: try out different types of faults and make a table on how they affect the components
 % TODO: make the algorithm online (constantly generating and analysing data)
 
-obj = Generator(num_signals, num_data_points, num_components_range, sampling_freq, freq_range, amplitude_range, phase_range, signal_to_noise_ratio, random_state, intermittent_prob, combined_prob, allow_intermittent, allow_combined, allow_multiple_intermittent, allow_multiple_combined);
-dataset = obj.generate_dataset([500 500]);
+% You can load the dataset instead of generating from scratch
+dataset = Dataset.load();
 
-% Save dataset if needed
-% dataset.save();
+if isempty(dataset)
+    disp("Generating data")
 
+    obj = Generator(num_signals, num_data_points, num_components_range, sampling_freq, freq_range, amplitude_range, phase_range, signal_to_noise_ratio, random_state, intermittent_prob, combined_prob, allow_intermittent, allow_combined, allow_multiple_intermittent, allow_multiple_combined);
+    dataset = obj.generate_dataset([500 500]);
 
-% Can load the dataset instead of generating from scratch
-% dataset = Dataset.load();
+    % Save dataset if needed (including the generator to save its parameters)
+    dataset.save();
 
-% plot_raw_signals(dataset.signals)
+    % Alternatively, we can save the data only
+    dataset.save_data()
+end
 
-
-
-
-
-% SAVING DATASET TO CSV
-
-% Convert dataset to table
-data = dataset.signals;
-ys = dataset.fault_flags;
-data = cat(2, data, ys);
-
-data = array2table(data);
-
-% Save table to CSV file
-path = './NeuralNet/data.csv'; 
-writetable(data, path);
+if num_signals <= 10
+    plot_raw_signals(dataset.signals)
+end
