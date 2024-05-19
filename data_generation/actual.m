@@ -20,7 +20,6 @@ alpha_3 = 0.3; % Damping with respect to the second parallel gear mesh
 z_r = 99; % No of teeths on ring
 z_s = 21; % No of teeths on sun
 z_p = 38; % No of teeths on planets
-
 phi_1 = 0; % phase angle with first planetary gear
 phi_2 = 120; % phase angle with second planetary gear
 phi_3 = 240; % phase angle with third planetary gear
