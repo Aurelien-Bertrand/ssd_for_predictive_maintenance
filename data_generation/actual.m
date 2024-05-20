@@ -1,5 +1,6 @@
 clear
 
+% TODO: where do these come from?
 vsp_11 = 0.004; % First Harmonic
 vrp_11 = 0.004;
 
@@ -19,7 +20,7 @@ alpha_3 = 0.3; % Damping with respect to the second parallel gear mesh
 % planetary gear
 z_r = 99; % No of teeths on ring
 z_s = 21; % No of teeths on sun
-z_p = 38; % No of teeths on planets
+z_p = 38; % No of teeths on planets % TODO: never used?
 phi_1 = 0; % phase angle with first planetary gear
 phi_2 = 120; % phase angle with second planetary gear
 phi_3 = 240; % phase angle with third planetary gear
@@ -30,7 +31,7 @@ z_g2 = 21; % No of teeths on g2
 
 % Second parallel gear mesh
 z_g3 = 123; % No of teeths on g3
-z_g4 = 25; % No of teeths on g4
+z_g4 = 25; % No of teeths on g4 % TODO: never used?
 
 
 w_c = 3.33; % Carrier frequency in Hz
@@ -65,5 +66,3 @@ x_final = alpha_1*x_sp1 + alpha_1*x_sp2 + alpha_1*x_sp3 + x_rp1 + x_rp2 + x_rp3 
 
 figure;
 plot(t,x_final);
-
-
