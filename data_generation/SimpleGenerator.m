@@ -6,9 +6,9 @@ classdef SimpleGenerator
         IMPULSE_PROBABILITY = 0.5
     end
     
-    properties % TODO: make the default values here
+    properties
         num_signals
-        num_data_points % TODO: get rid of this
+        num_data_points
         num_components_range
         sampling_freq
         freq_range
@@ -144,7 +144,7 @@ classdef SimpleGenerator
                     end
                 end
                 
-                if generate_combined % TODO: I think there is something wrong here...
+                if generate_combined
                     frequency_range = [new_freq_hz * (1 - obj.MAX_NARROW_FREQUENCY_DIFFERENCE), new_freq_hz * (1 + obj.MAX_NARROW_FREQUENCY_DIFFERENCE)];
                     [additional_component, additional_freq] = obj.generate_random_signal(frequency_range, randi(2^31 - 1));
                     component = component + additional_component;
