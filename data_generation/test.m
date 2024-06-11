@@ -1,6 +1,6 @@
 addpath("plotting")
 
-num_signals = 50000;
+num_signals = 25000;
 num_data_points = 1000;
 num_components_range = [5 5]; % TODO: play with this
 sampling_freq = 1000; % TODO: check realistic values -- for us
@@ -45,5 +45,5 @@ data = cat(2, data, ys);
 data = array2table(data);
 
 % Save table to CSV file
-path = './NeuralNet/data.csv'; 
-writetable(data, path);
+path = './NeuralNet/data/test.csv'; 
+writetable(data, path)
