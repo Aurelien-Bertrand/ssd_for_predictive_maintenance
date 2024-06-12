@@ -1,5 +1,4 @@
 .DS_Store
-test.ipynb
 NeuralNet/data.csv
 NeuralNet/test.csv
 cache/dataset.mat

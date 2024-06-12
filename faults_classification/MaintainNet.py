@@ -52,9 +52,6 @@ class MaintainNet(nn.Module):
             x = F.relu(bn(conv(x)))
             x = F.max_pool1d(x, kernel_size=2, stride=2)  # Adjusted max pooling stride
 
-        # Flatten the output for the linear layer
-        # x = x.view(x.size(0), -1)  # Flatten
-
         # Classifier
         x = self.classifier(x)
 
@@ -211,27 +208,29 @@ class MaintainNet(nn.Module):
         accuracy = 100 * correct / total
         print(f'Test Loss: {test_loss}, Accuracy: {accuracy}%')
 
-    # Visualize an original image and the result from the autoencoder
-    def infer(self, i=0, inputs=None):
+    # Takes as input signal of length 1000
+    def predict(self, input):
         self.eval()  # Set the model to evaluation mode
 
         with torch.no_grad():
-            if inputs == None:
-                inputs, targets = next(iter(self.validation_loader))
+            
+            input = torch.tensor(input, dtype=torch.float32)
 
-            inputs = inputs.to(self.device)
+            input = input.to(self.device)
+            input = self.normalize_data(input)
+            input = input.unsqueeze(0)
+            input = input.unsqueeze(0)
+
             
             # Run inputs through the network
-            outputs = self(inputs)
+            output = self(input)
 
             # Move back to CPU if necessary
-            inputs = inputs.cpu()
-            outputs = outputs.cpu()
-            targets = targets.cpu()
+            output = output.cpu()
 
              # Convert tensors to numpy arrays
-            input_signal = inputs.squeeze().numpy()[i]
-            output_component  = outputs.squeeze().numpy()[i]
-            target_component = targets.squeeze().numpy()[i]
+            output  = output.squeeze().numpy()
 
-            return input_signal, output_component, target_component
+            output = np.argmax(output)
+
+            return output
