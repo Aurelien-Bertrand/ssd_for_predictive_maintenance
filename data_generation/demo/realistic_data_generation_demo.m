@@ -1,8 +1,9 @@
-sampling_frequency = 2560;
-n_teeths_by_gear = [99 21 38 95 21 123 25];
-carrier_frequency = 10/3;
-signal_to_noise_ratio = 0.5;
+addpath ../data_generation
 
+sampling_frequency = 2560;
+number_of_blades = 3;
+signal_to_noise_ratio = 0;
+rotor_speed_range = [9000/10 9000/10]; % This makes carrier frequency of 10/3
 
 % You can load the dataset instead of generating from scratch
 dataset = Dataset.load();
@@ -12,9 +13,9 @@ if isempty(dataset)
 
     generator = RealisticGenerator(...
         sampling_frequency,...
-        n_teeths_by_gear,...
-        carrier_frequency,...
-        signal_to_noise_ratio...
+        number_of_blades,...
+        signal_to_noise_ratio,...
+        rotor_speed_range...
     );
 
     dataset = generator.generate_dataset(10, 0, 1);

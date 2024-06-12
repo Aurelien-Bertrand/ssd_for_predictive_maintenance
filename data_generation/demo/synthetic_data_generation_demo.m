@@ -1,21 +1,20 @@
+addpath ../data_generation
+
 num_signals = 10;
 num_data_points = 1000;
-num_components_range = [5 5]; % TODO: play with this
-sampling_freq = 1000; % TODO: check realistic values -- for us
-freq_range = [2 100]; % TODO: check realistic values -- for us
-amplitude_range = [1 5]; % TODO: check realistic values -- for us
-phase_range = [0 1]; % TODO: check realistic values -- for us
+num_components_range = [5 5];
+sampling_freq = 1000;
+freq_range = [2 100];
+amplitude_range = [1 5];
+phase_range = [0 1];
 signal_to_noise_ratio = 0.1;
 random_state = 101;
-intermittent_prob = 0.33; % TODO: play with this
-combined_prob = 0.33; % TODO: play with this
-allow_intermittent = true; % TODO: play with this
-allow_combined = true; % TODO: play with this
+intermittent_prob = 0.33;
+combined_prob = 0.33;
+allow_intermittent = true;
+allow_combined = true;
 allow_multiple_intermittent = true;
 allow_multiple_combined = true;
-
-% TODO: try out different types of faults and make a table on how they affect the components
-% TODO: make the algorithm online (constantly generating and analysing data)
 
 % You can load the dataset instead of generating from scratch
 dataset = Dataset.load();

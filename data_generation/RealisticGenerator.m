@@ -1,36 +1,40 @@
 classdef RealisticGenerator
     % This generator simulates vibration signals in a specific gearbox of a wind turbine
-    % TODO: detail what mesh we have etc.
+    % TODO: mention what wind turbine it is!
     properties (Constant, Access = private)
-        PHASE_ANGLE_FIRST_PLANETARY_GEAR = 0;
-        PHASE_ANGLE_SECOND_PLANETARY_GEAR = 120;
-        PHASE_ANGLE_THIRD_PLANETARY_GEAR = 240;
-
-        DAMPING_WRT_SUN = 0.9;
-        DAMPING_WRT_FIRST_PARALLEL_GEAR = 0.4;
-        DAMPING_WRT_SECOND_PARALLEL_GEAR = 0.3;
-
-        IMPULSE_PROBABILITY = 0.5
+        IMPULSE_PROBABILITY = 0.5 % TODO: not sure if we need this?
     end
 
     properties
         sampling_frequency
-        n_teeths_by_gear
+        number_of_blades
         signal_to_noise_ratio
-        system_frequencies
+        rotor_speed_range
+        range_n_teeth
     end
 
     methods
         function obj = RealisticGenerator(...
             sampling_frequency,...
-            n_teeths_by_gear,...
-            carrier_frequency,...
-            signal_to_noise_ratio...
+            number_of_blades,...
+            signal_to_noise_ratio,...
+            rotor_speed_range,...
+            range_n_teeth...
         )
+            if nargin < 4 || isempty(rotor_speed_range)
+                % Rotor speed ranges from 120 to 210 m/s
+                % TODO: find paper to proof this
+                rotor_speed_range = [120 210];
+            end
+            if nargin < 5 || isempty(range_n_teeth) % TODO: find realistic values with article!
+                range_n_teeth = [90 130];
+            end
+
             obj.sampling_frequency = sampling_frequency;
-            obj.n_teeths_by_gear = n_teeths_by_gear;
-            obj.system_frequencies = obj.compute_system_frequencies(carrier_frequency);
+            obj.number_of_blades = number_of_blades;
             obj.signal_to_noise_ratio = signal_to_noise_ratio;
+            obj.rotor_speed_range = rotor_speed_range;
+            obj.range_n_teeth = range_n_teeth;
         end
 
         function dataset = generate_dataset(obj, num_signals, start_time, end_time)
@@ -38,67 +42,43 @@ classdef RealisticGenerator
             
             signals = zeros(num_signals, length(time));
             fault_flags = false(num_signals, 1);
-
-            % TODO: where do these come from?
-            vsp_11 = 0.004; % First Harmonic
-            vrp_11 = 0.004;
-            vsp_12 = 0.002; % Second Harmonic
-            vrp_12 = 0.002;
-            vsp_13 = 0.0015; % Third Harmonic
-            vrp_13 = 0.0015;
-            v_21 = 0.1; % Fundamental Meshing Harmonic
-            v_31 = 0.5; % Fundamental Meshing Harmonic
-
-            % Sun-Planetary gear signal over the first 3 harmonics
-            x_sp1 = vsp_11*cos(pi*obj.system_frequencies(3)*(time+(obj.PHASE_ANGLE_FIRST_PLANETARY_GEAR/(obj.system_frequencies(2)-obj.system_frequencies(1))))) + vsp_12*cos(2*pi*obj.system_frequencies(3)*(time+(obj.PHASE_ANGLE_FIRST_PLANETARY_GEAR/(obj.system_frequencies(2)-obj.system_frequencies(1))))) + vsp_13*cos(3*pi*obj.system_frequencies(3)*(time+(obj.PHASE_ANGLE_FIRST_PLANETARY_GEAR/(obj.system_frequencies(2)-obj.system_frequencies(1)))));
-            x_sp2 = vsp_11*cos(pi*obj.system_frequencies(3)*(time+(obj.PHASE_ANGLE_SECOND_PLANETARY_GEAR/(obj.system_frequencies(2)-obj.system_frequencies(1))))) + vsp_12*cos(2*pi*obj.system_frequencies(3)*(time+(obj.PHASE_ANGLE_SECOND_PLANETARY_GEAR/(obj.system_frequencies(2)-obj.system_frequencies(1))))) + vsp_13*cos(3*pi*obj.system_frequencies(3)*(time+(obj.PHASE_ANGLE_SECOND_PLANETARY_GEAR/(obj.system_frequencies(2)-obj.system_frequencies(1)))));
-            x_sp3 = vsp_11*cos(pi*obj.system_frequencies(3)*(time+(obj.PHASE_ANGLE_THIRD_PLANETARY_GEAR/(obj.system_frequencies(2)-obj.system_frequencies(1))))) + vsp_12*cos(2*pi*obj.system_frequencies(3)*(time+(obj.PHASE_ANGLE_THIRD_PLANETARY_GEAR/(obj.system_frequencies(2)-obj.system_frequencies(1))))) + vsp_13*cos(3*pi*obj.system_frequencies(3)*(time+(obj.PHASE_ANGLE_THIRD_PLANETARY_GEAR/(obj.system_frequencies(2)-obj.system_frequencies(1)))));
-
-            % Ring-Planetary gear signal over the first 3 harmonics
-            x_rp1 = vrp_11*cos(pi*obj.system_frequencies(3)*(time-(obj.PHASE_ANGLE_FIRST_PLANETARY_GEAR/obj.system_frequencies(1)))) + vrp_12*cos(2*pi*obj.system_frequencies(3)*(time-(obj.PHASE_ANGLE_FIRST_PLANETARY_GEAR/obj.system_frequencies(1)))) + vrp_13*cos(3*pi*obj.system_frequencies(3)*(time-(obj.PHASE_ANGLE_FIRST_PLANETARY_GEAR/obj.system_frequencies(1))));
-            x_rp2 = vrp_11*cos(pi*obj.system_frequencies(3)*(time-(obj.PHASE_ANGLE_SECOND_PLANETARY_GEAR/obj.system_frequencies(1)))) + vrp_12*cos(2*pi*obj.system_frequencies(3)*(time-(obj.PHASE_ANGLE_SECOND_PLANETARY_GEAR/obj.system_frequencies(1)))) + vrp_13*cos(3*pi*obj.system_frequencies(3)*(time-(obj.PHASE_ANGLE_SECOND_PLANETARY_GEAR/obj.system_frequencies(1))));
-            x_rp3 = vrp_11*cos(pi*obj.system_frequencies(3)*(time-(obj.PHASE_ANGLE_THIRD_PLANETARY_GEAR/obj.system_frequencies(1)))) + vrp_12*cos(2*pi*obj.system_frequencies(3)*(time-(obj.PHASE_ANGLE_THIRD_PLANETARY_GEAR/obj.system_frequencies(1)))) + vrp_13*cos(3*pi*obj.system_frequencies(3)*(time-(obj.PHASE_ANGLE_THIRD_PLANETARY_GEAR/obj.system_frequencies(1))));
-
-            % First Parallel gear signal
-            x_2 = v_21*cos(pi*obj.system_frequencies(4)*time);
-
-            % Second Parallel gear signal
-            x_3 = v_31*cos(pi*obj.system_frequencies(5)*time);
-
-            % Overall Signal
-            combined_signal = obj.DAMPING_WRT_SUN*x_sp1 +...
-                              obj.DAMPING_WRT_SUN*x_sp2 +...
-                              obj.DAMPING_WRT_SUN*x_sp3 +...
-                              x_rp1 +...
-                              x_rp2 +...
-                              x_rp3 +...
-                              obj.DAMPING_WRT_FIRST_PARALLEL_GEAR*x_2 +...
-                              obj.DAMPING_WRT_SECOND_PARALLEL_GEAR*x_3;
             
             parfor i = 1:num_signals
+                % Compute random blade frequency, based on rotor speed (in m/s) and convert to Hz
+                blade_frequency = 1/unifrnd(obj.rotor_speed_range(1), obj.rotor_speed_range(2))*1000;
+                % Generate random number of teeth for each gear
+                n_teeth_by_gear = obj.randomize_gear_teeth();
+
+                % Generate a wind turbine with random characteristics and its signal for a given time
+                wind_turbine = WindTurbine(obj.number_of_blades, blade_frequency, n_teeth_by_gear);
+                disp(wind_turbine)
+                signal = wind_turbine.generate_signal(time);
+
+                % Add noise if needed
                 if obj.signal_to_noise_ratio ~= 0
-                    noise = obj.generate_noise(combined_signal);
-                    signals(i, :) = combined_signal + noise;
-                else 
-                    signals(i, :) = combined_signal;
+                    noise = obj.generate_noise(signal);
+                    signal = signal + noise;
                 end
+                signals(i, :) = signal;
             end
+
             dataset = Dataset(obj, time, signals, fault_flags);
         end
     end
 
     methods (Access = private)
-        function system_frequencies = compute_system_frequencies(obj, carrier_frequency)
-            temp = (1+obj.n_teeths_by_gear(1)/obj.n_teeths_by_gear(2));
-            
-            sun_frequency = temp*carrier_frequency;
-            planetary_gear_meshing_frequency = obj.n_teeths_by_gear(1)*carrier_frequency;
-            first_parallel_gear_meshing_frequency = temp*obj.n_teeths_by_gear(3)*carrier_frequency;
-            second_parallel_gear_meshing_frequency = temp*(obj.n_teeths_by_gear(3)/obj.n_teeths_by_gear(4))*obj.n_teeths_by_gear(5)*carrier_frequency;
+        function n_teeth_by_gear = randomize_gear_teeth(obj)
+            ps_ring_n_teeth = randi(obj.range_n_teeth);
+            ps_planets_n_teeth = randi([round(ps_ring_n_teeth/4), round(ps_ring_n_teeth/3)]);
+            ps_sun_n_teeth = randi([round(ps_ring_n_teeth/5), round(ps_ring_n_teeth/4)]);
 
-            system_frequencies = [
-                carrier_frequency, sun_frequency, planetary_gear_meshing_frequency, first_parallel_gear_meshing_frequency, second_parallel_gear_meshing_frequency
-            ];
+            iss_g1 = randi(obj.range_n_teeth);
+            iss_g2 = randi([round(iss_g1/6), round(iss_g1/4)]);
+
+            hss_g3 = randi(obj.range_n_teeth);
+            hss_g4 = randi([round(iss_g1/6), round(iss_g1/4)]);
+
+            n_teeth_by_gear = [ps_ring_n_teeth, ps_sun_n_teeth, ps_planets_n_teeth, iss_g1, iss_g2, hss_g3, hss_g4];
         end
 
         function noise_signal = generate_noise(obj, signal)
