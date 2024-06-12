@@ -1,4 +1,4 @@
-classdef Generator
+classdef SimpleGenerator
     properties (Constant, Access = private)
         MIN_FREQUENCY_DIFFERENCE = 0.2
         MAX_NARROW_FREQUENCY_DIFFERENCE = 0.25
@@ -8,7 +8,7 @@ classdef Generator
     
     properties % TODO: make the default values here
         num_signals
-        num_data_points
+        num_data_points % TODO: get rid of this
         num_components_range
         sampling_freq
         freq_range
@@ -25,9 +25,22 @@ classdef Generator
     end
 
     methods
-        function obj = Generator(num_signals, num_data_points, num_components_range, sampling_freq, freq_range, amplitude_range, phase_range, signal_to_noise_ratio, random_state, intermittent_prob, combined_prob, allow_intermittent, allow_combined, allow_multiple_intermittent, allow_multiple_combined)
-            addpath("./data_generation/")
-
+        function obj = SimpleGenerator(num_signals,...
+            num_data_points,...
+            num_components_range,...
+            sampling_freq,...
+            freq_range,...
+            amplitude_range,...
+            phase_range,...
+            signal_to_noise_ratio,...
+            random_state,...
+            intermittent_prob,...
+            combined_prob,...
+            allow_intermittent,...
+            allow_combined,...
+            allow_multiple_intermittent,...
+            allow_multiple_combined...
+        )
             obj.num_signals = num_signals;
             obj.num_data_points = num_data_points;
             obj.num_components_range = num_components_range;
@@ -52,12 +65,12 @@ classdef Generator
             if nargin < 3 || isempty(probability)
                 probability = (additional_component_frequency_range ~= 0) * 0.5;
             end
-        
+
             components = cell(obj.num_signals, 1);
             signals = zeros(obj.num_signals, obj.num_data_points);
             fault_flags = false(obj.num_signals, 1);
-        
-            for i = 1:obj.num_signals
+            
+            parfor i = 1:obj.num_signals
                 freq_comp_pairs = obj.generate_signal();
                 components{i} = freq_comp_pairs;
                 composed_signal = sum(freq_comp_pairs, 1);
@@ -72,20 +85,22 @@ classdef Generator
                 end
                 signals(i, :) = composed_signal;
             end
-            dataset = Dataset(obj, components, signals, fault_flags);
+            time = (0:obj.num_data_points-1) / obj.sampling_freq;
+            dataset = Dataset(obj, time, signals, fault_flags, components);
         end
     end
 
     methods (Access = private)
         function [signal, frequency] = generate_random_signal(obj, frequency_range, random_state)
+            time = (0:obj.num_data_points-1) / obj.sampling_freq;
+
             rng(random_state);
-            t = (0:obj.num_data_points-1) / obj.sampling_freq;
             
             amplitude = unifrnd(obj.amplitude_range(1), obj.amplitude_range(2));
             frequency = unifrnd(frequency_range(1), frequency_range(2));
             theta = unifrnd(obj.phase_range(1), obj.phase_range(2));
             
-            signal = amplitude * sin(2 * pi * frequency * t + theta);
+            signal = amplitude * sin(2*pi*frequency*time + theta);
         end
 
         function signal = truncate_signal(obj, signal, include_end)
@@ -106,7 +121,7 @@ classdef Generator
             num_components = randi(obj.num_components_range);
             components = zeros(num_components, obj.num_data_points);
             frequencies = zeros(num_components, 1);
-        
+            
             for i = 1:num_components
                 generate_new_component = true;
                 generate_attempts = 0;
