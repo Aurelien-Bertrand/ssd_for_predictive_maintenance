@@ -4,5 +4,6 @@ NeuralNet/test.csv
 cache/dataset.mat
 cache/dataset.mat
 NeuralNet/data/test_processed.csv
-NeuralNet/data/test.csv
-NeuralNet/data/data.csv
+NeuralNet/data/*
+__pycache__/
+data
