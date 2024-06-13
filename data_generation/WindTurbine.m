@@ -7,10 +7,11 @@ classdef WindTurbine
         DAMPING_WRT_SUN = 0.9;
         DAMPING_WRT_FIRST_PARALLEL_GEAR = 0.4;
         DAMPING_WRT_SECOND_PARALLEL_GEAR = 0.3;
+
+        NUMBER_OF_BLADES = 3
     end
 
     properties
-        number_of_blades
         blade_frequency
         carrier_frequency
         number_of_teeth_by_gear
@@ -18,10 +19,9 @@ classdef WindTurbine
     end
 
     methods
-        function obj = WindTurbine(number_of_blades, blade_frequency, number_of_teeth_by_gear)
-            obj.number_of_blades = number_of_blades;
+        function obj = WindTurbine(blade_frequency, number_of_teeth_by_gear)
             obj.blade_frequency = blade_frequency;
-            obj.carrier_frequency = number_of_blades * blade_frequency;
+            obj.carrier_frequency = obj.NUMBER_OF_BLADES * blade_frequency;
             obj.number_of_teeth_by_gear = number_of_teeth_by_gear;
             obj.system_frequencies = obj.compute_system_frequencies();
         end

@@ -1,6 +1,6 @@
 classdef Dataset
     properties (Constant, Access = private)
-        CACHE_PATH = "../cache/"
+        CACHE_PATH = "../_cache/"
         DATASET_PATH = strcat(Dataset.CACHE_PATH, "dataset.mat")
         DATA_PATH = strcat(Dataset.CACHE_PATH, "data.csv")
     end
@@ -29,12 +29,14 @@ classdef Dataset
         function save(obj)
             disp("Saving dataset...")
             save(obj.DATASET_PATH, "obj", "-v7.3");
+            disp("Dataset saved.")
         end
 
         function save_data(obj)
             disp("Saving data...")
             data = array2table([obj.signals obj.fault_flags]);
-            save(obj.DATA_PATH, "data");
+            writetable(data, obj.DATA_PATH)
+            disp("Data saved.")
         end
 
         function plot(obj)
