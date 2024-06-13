@@ -7,7 +7,6 @@ classdef RealisticGenerator
 
     properties
         sampling_frequency
-        number_of_blades
         signal_to_noise_ratio
         rotor_speed_range
         range_n_teeth
@@ -35,20 +34,19 @@ classdef RealisticGenerator
             obj.range_n_teeth = range_n_teeth;
         end
 
-        function dataset = generate_dataset(obj, num_signals, start_time, end_time)
-            time = start_time:1/obj.sampling_frequency:end_time;
-            
+        function dataset = generate_dataset(obj, num_signals, time)
             signals = zeros(num_signals, length(time));
             fault_flags = false(num_signals, 1);
             
-            parfor i = 1:num_signals
+            % parfor i = 1:num_signals
+            for i = 1:num_signals
                 % Compute random blade frequency, based on rotor speed (in m/s) and convert to Hz
                 blade_frequency = 1/unifrnd(obj.rotor_speed_range(1), obj.rotor_speed_range(2))*1000;
                 % Generate random number of teeth for each gear
                 n_teeth_by_gear = obj.randomize_gear_teeth();
 
                 % Generate a wind turbine with random characteristics and its signal for a given time
-                wind_turbine = WindTurbine(obj.number_of_blades, blade_frequency, n_teeth_by_gear);
+                wind_turbine = WindTurbine(blade_frequency, n_teeth_by_gear);
                 disp(wind_turbine)
                 signal = wind_turbine.generate_signal(time);
 
@@ -61,6 +59,7 @@ classdef RealisticGenerator
             end
 
             dataset = Dataset(obj, time, signals, fault_flags);
+            disp("Data generated")
         end
     end
 
