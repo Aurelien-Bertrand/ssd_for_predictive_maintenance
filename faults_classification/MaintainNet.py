@@ -10,6 +10,8 @@ from torch.utils.data import TensorDataset, DataLoader
 import math
 from tqdm import tqdm
 
+from _map_class_index_to_name import map_class_index_to_name
+
 PRINTER = False
 PATIENCE = 3
 
@@ -18,7 +20,6 @@ class MaintainNet(nn.Module):
         super(MaintainNet, self).__init__()
         self.name = name
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
         
         # Define convolutional layers
         self.conv_layers = nn.ModuleList([
@@ -216,5 +217,5 @@ class MaintainNet(nn.Module):
             output  = output.squeeze().numpy()
 
             output = np.argmax(output)
-
-            return output
+            
+            return map_class_index_to_name(int(output))
