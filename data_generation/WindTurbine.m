@@ -1,4 +1,6 @@
 classdef WindTurbine
+    % This generator simulates vibration signals in a specific gearbox of a wind turbine
+    % TODO: mention what wind turbine it is!
     properties (Access = private, Constant)
         PHASE_ANGLE_FIRST_PLANETARY_GEAR = 0;
         PHASE_ANGLE_SECOND_PLANETARY_GEAR = 120;
@@ -19,10 +21,10 @@ classdef WindTurbine
     end
 
     methods
-        function obj = WindTurbine(blade_frequency, number_of_teeth_by_gear)
+        function obj = WindTurbine(blade_frequency, range_n_teeth)
             obj.blade_frequency = blade_frequency;
             obj.carrier_frequency = obj.NUMBER_OF_BLADES * blade_frequency;
-            obj.number_of_teeth_by_gear = number_of_teeth_by_gear;
+            obj.number_of_teeth_by_gear = randomize_gear_teeth(range_n_teeth);
             obj.system_frequencies = obj.compute_system_frequencies();
         end
     end
@@ -77,6 +79,20 @@ classdef WindTurbine
     end
 
     methods (Access = private)
+        function n_teeth_by_gear = randomize_gear_teeth(range_n_teeth)
+            ps_ring_n_teeth = randi(range_n_teeth);
+            ps_planets_n_teeth = randi([round(ps_ring_n_teeth/4), round(ps_ring_n_teeth/3)]);
+            ps_sun_n_teeth = randi([round(ps_ring_n_teeth/5), round(ps_ring_n_teeth/4)]);
+
+            iss_g1 = randi(range_n_teeth);
+            iss_g2 = randi([round(iss_g1/6), round(iss_g1/4)]);
+
+            hss_g3 = randi(range_n_teeth);
+            hss_g4 = randi([round(iss_g1/6), round(iss_g1/4)]);
+
+            n_teeth_by_gear = [ps_ring_n_teeth, ps_sun_n_teeth, ps_planets_n_teeth, iss_g1, iss_g2, hss_g3, hss_g4];
+        end
+
         function system_frequencies = compute_system_frequencies(obj)
             ring_to_sun_teeth_ratio = (1+obj.number_of_teeth_by_gear(1)/obj.number_of_teeth_by_gear(2));
             

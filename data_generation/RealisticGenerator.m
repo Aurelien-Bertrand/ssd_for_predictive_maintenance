@@ -1,6 +1,4 @@
 classdef RealisticGenerator
-    % This generator simulates vibration signals in a specific gearbox of a wind turbine
-    % TODO: mention what wind turbine it is!
     properties (Constant, Access = private)
         IMPULSE_PROBABILITY = 0.5 % TODO: not sure if we need this?
     end
@@ -42,12 +40,12 @@ classdef RealisticGenerator
             for i = 1:num_signals
                 % Compute random blade frequency, based on rotor speed (in m/s) and convert to Hz
                 blade_frequency = 1/unifrnd(obj.rotor_speed_range(1), obj.rotor_speed_range(2))*1000;
-                % Generate random number of teeth for each gear
-                n_teeth_by_gear = obj.randomize_gear_teeth();
 
                 % Generate a wind turbine with random characteristics and its signal for a given time
-                wind_turbine = WindTurbine(blade_frequency, n_teeth_by_gear);
+                wind_turbine = WindTurbine(blade_frequency, obj.range_n_teeth);
                 disp(wind_turbine)
+
+                % Generate a signal from the wind turbine
                 signal = wind_turbine.generate_signal(time);
 
                 % Add noise if needed
@@ -64,20 +62,6 @@ classdef RealisticGenerator
     end
 
     methods (Access = private)
-        function n_teeth_by_gear = randomize_gear_teeth(obj)
-            ps_ring_n_teeth = randi(obj.range_n_teeth);
-            ps_planets_n_teeth = randi([round(ps_ring_n_teeth/4), round(ps_ring_n_teeth/3)]);
-            ps_sun_n_teeth = randi([round(ps_ring_n_teeth/5), round(ps_ring_n_teeth/4)]);
-
-            iss_g1 = randi(obj.range_n_teeth);
-            iss_g2 = randi([round(iss_g1/6), round(iss_g1/4)]);
-
-            hss_g3 = randi(obj.range_n_teeth);
-            hss_g4 = randi([round(iss_g1/6), round(iss_g1/4)]);
-
-            n_teeth_by_gear = [ps_ring_n_teeth, ps_sun_n_teeth, ps_planets_n_teeth, iss_g1, iss_g2, hss_g3, hss_g4];
-        end
-
         function noise_signal = generate_noise(obj, signal)
             signal_power = mean(signal.^2);
             noise_power = signal_power / (10^(obj.signal_to_noise_ratio / 10));
