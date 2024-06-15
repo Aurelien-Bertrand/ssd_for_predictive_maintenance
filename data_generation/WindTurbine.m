@@ -24,7 +24,7 @@ classdef WindTurbine
         function obj = WindTurbine(blade_frequency, range_n_teeth)
             obj.blade_frequency = blade_frequency;
             obj.carrier_frequency = obj.NUMBER_OF_BLADES * blade_frequency;
-            obj.number_of_teeth_by_gear = randomize_gear_teeth(range_n_teeth);
+            obj.number_of_teeth_by_gear = obj.randomize_gear_teeth(range_n_teeth);
             obj.system_frequencies = obj.compute_system_frequencies();
         end
     end
@@ -79,7 +79,7 @@ classdef WindTurbine
     end
 
     methods (Access = private)
-        function n_teeth_by_gear = randomize_gear_teeth(range_n_teeth)
+        function n_teeth_by_gear = randomize_gear_teeth(obj, range_n_teeth)
             ps_ring_n_teeth = randi(range_n_teeth);
             ps_planets_n_teeth = randi([round(ps_ring_n_teeth/4), round(ps_ring_n_teeth/3)]);
             ps_sun_n_teeth = randi([round(ps_ring_n_teeth/5), round(ps_ring_n_teeth/4)]);
