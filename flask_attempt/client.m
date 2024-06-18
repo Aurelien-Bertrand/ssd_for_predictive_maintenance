@@ -1,4 +1,5 @@
 url = 'http://127.0.0.1:5000/predict';
+
 signal = randn(1000, 1);
 
 % Convert the array to a JSON string

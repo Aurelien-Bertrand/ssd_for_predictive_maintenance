@@ -1,5 +1,5 @@
 addpath ../data_generation
-
+disp(path)
 num_signals = 10;
 num_data_points = 1000;
 num_components_range = [5 5];
@@ -17,7 +17,7 @@ allow_multiple_intermittent = true;
 allow_multiple_combined = true;
 
 % You can load the dataset instead of generating from scratch
-dataset = Dataset.load();
+% dataset = Dataset.load();
 
 if isempty(dataset)
     disp("Generating data...")

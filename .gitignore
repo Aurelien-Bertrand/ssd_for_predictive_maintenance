@@ -8,3 +8,4 @@ NeuralNet/data/*
 __pycache__/
 data
 /env
+MaintainNet.ipynb

@@ -64,7 +64,7 @@ end
 
 remen = 1;
 testcond = 0;
-
+first_comp = 1;
 while (remen > th) && (k1 < maxNumberofComponents)
     k1 = k1+1;
     v = v-mean(v);
@@ -81,7 +81,14 @@ while (remen > th) && (k1 < maxNumberofComponents)
         for k=1:L-(l-1),
             M(k,:) = v2(k:k+(l-1));
         end
-        [U,S,V] = rsvd(Mm, maxNumberofComponents);
+
+        if first_comp
+            [U,S,V] = rsvd(Mm, 50);
+            first_comp = 0;
+        else
+            [U,S,V] = rsvd(Mm, 10);
+        end
+
         U(:,l+1:end) = [];
         S(l+1:end,:) = [];
         V(:,l+1:end) = [];
@@ -111,7 +118,12 @@ while (remen > th) && (k1 < maxNumberofComponents)
                 M(:,k)=[v2(end-k+2:end)'; v2(1:end-k+1)'];
             end
             
-            [U,S,V] = rsvd(M,maxNumberofComponents);
+            if first_comp
+                [U,S,V] = rsvd(M, 50);
+                first_comp = 0;
+            else
+                [U,S,V] = rsvd(M, 10);
+            end
             
             %% Selection of all principal components with a dominant frequency
             % inside the estimated band-width
