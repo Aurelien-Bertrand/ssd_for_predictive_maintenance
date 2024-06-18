@@ -7,3 +7,4 @@ NeuralNet/data/test_processed.csv
 NeuralNet/data/*
 __pycache__/
 data
+/env

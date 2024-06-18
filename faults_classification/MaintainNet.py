@@ -10,7 +10,7 @@ from torch.utils.data import TensorDataset, DataLoader
 import math
 from tqdm import tqdm
 
-from _map_class_index_to_name import map_class_index_to_name
+from faults_classification._map_class_index_to_name import map_class_index_to_name
 
 PRINTER = False
 PATIENCE = 3
