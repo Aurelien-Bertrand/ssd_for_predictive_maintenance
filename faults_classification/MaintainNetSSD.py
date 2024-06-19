@@ -6,7 +6,7 @@ import pandas as pd
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.utils.data import TensorDataset, DataLoader
+from torch.utils.data import Dataset, TensorDataset, DataLoader
 import math
 from tqdm import tqdm
 
@@ -22,7 +22,7 @@ class MaintainNetSSD(nn.Module):
 
         # Define convolutional layers
         self.conv_layers = nn.ModuleList([
-            nn.Conv1d(in_channels=8, out_channels=16, kernel_size=64, padding=32),  # Initial layer for multiple channels
+            nn.Conv1d(in_channels=10, out_channels=16, kernel_size=64, padding=32),  # Initial layer for multiple channels
             nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, padding=1),
             nn.Conv1d(in_channels=32, out_channels=64, kernel_size=3, padding=1),
             nn.Conv1d(in_channels=64, out_channels=64, kernel_size=3, padding=1),
@@ -41,9 +41,10 @@ class MaintainNetSSD(nn.Module):
         for _ in range(len(self.conv_layers)):  # Calculating the size after each pooling
             final_time_steps = (final_time_steps + 1) // 2  # Adjusting for each pooling layer
 
+        print(final_time_steps)
         # Calculate size for the linear layer to match the output size of the last convolutional layer
-        self.linear_input_size = final_time_steps * 1  # Adjusted for number of output channels from the last conv layer
-
+        self.linear_input_size = final_time_steps # Adjusted for number of output channels from the last conv layer
+        self.linear_input_size = 7
         # Define the linear layer
         self.classifier = nn.Linear(self.linear_input_size, num_classes)
 
@@ -59,7 +60,6 @@ class MaintainNetSSD(nn.Module):
 
         # Flatten the output for the linear layer
         x = x.view(x.size(0), -1)  # Flatten
-
         # Classifier
         x = self.classifier(x)
 
@@ -68,67 +68,22 @@ class MaintainNetSSD(nn.Module):
     
     # Separate images into train, validation, and test sets
     def load_data(self, data, batch_size=64):
-
-        N = data.shape[1] - 1
-
-        xs = data.iloc[:,:N-1].to_numpy()
-        ys = data.iloc[:,N].to_numpy()
-        
-        # Normalize data [-1,1]
-        xs = self.normalize_data(xs)
-
-        # Convert to tensors
-        xs = torch.tensor(xs, dtype=torch.float32)
-        ys = torch.tensor(ys, dtype=torch.float32)
-        
-        xs = xs.unsqueeze(1)
+        N = len(data.index.unique())
 
         # Create tensor dataset
-        dataset = TensorDataset(xs, ys)
+        dataset = SignalDataset(data)
 
         # Separate data
-        train_size = int(0.8 * len(data))
-        validation_size = len(data) - train_size
+        train_size = int(0.8 * N)
+        validation_size = N - train_size
         self.train_dataset, self.validation_dataset = random_split(dataset, [train_size, validation_size])
-
 
         # # Create dataloders
         self.train_loader = DataLoader(dataset=self.train_dataset, batch_size=batch_size, shuffle=True)
         self.validation_loader = DataLoader(dataset=self.validation_dataset, batch_size=batch_size, shuffle=True)
 
-    
-    def load_test_data(self, data, batch_size=64):
-        N = data.shape[1] - 1
-
-        xs = data.iloc[:,:N-1].to_numpy()
-        ys = data.iloc[:,N].to_numpy()
         
-        # Normalize data [-1,1]
-        xs = self.normalize_data(xs)
 
-        # Convert to tensors
-        xs = torch.tensor(xs, dtype=torch.float32)
-        ys = torch.tensor(ys, dtype=torch.float32)
-        
-        xs = xs.unsqueeze(1)
-
-        # Create tensor dataset
-        dataset = TensorDataset(xs, ys)
-
-        # Create dataloders
-        self.test_loader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
-        
-    def normalize_data(self, xs):
-        self.min_val = xs.min()
-        self.max_val = xs.max()
-
-        xs_normal = 2 * (xs - self.min_val) / (self.max_val - self.min_val) - 1
-
-        return xs_normal
-
-    def unnormalize_data(self, data):
-        return ((data + 1) / 2) * (self.max_val - self.min_val) + self.min_val
-    
     # Function to train the autoencoder
     def trainer(self, num_epochs):
         val_losses = []
@@ -240,3 +195,29 @@ class MaintainNetSSD(nn.Module):
             target_component = targets.squeeze().numpy()[i]
 
             return input_signal, output_component, target_component
+
+
+
+class SignalDataset(Dataset):
+    def __init__(self, dataframe):
+        self.dataframe = dataframe
+        self.signal_ids = self.dataframe.index.unique()
+
+    def __len__(self):
+        return len(self.signal_ids)
+
+    def __getitem__(self, idx):
+        signal_id = self.signal_ids[idx]
+        id_data = self.dataframe.loc[signal_id]
+        signal_data = id_data.values[:,:-1]  # Extract the 10 rows of components
+        target = id_data.iloc[-1,-1]  # Extract the target
+
+        # Normalize the signal data to be between -1 and 1
+        signal_data = (signal_data - signal_data.min()) / (signal_data.max() - signal_data.min()) * 2 - 1
+
+        # Convert to PyTorch tensors
+        signal_data = torch.tensor(signal_data, dtype=torch.float32)
+        target = torch.tensor(target, dtype=torch.long)
+
+        return signal_data, target
+    
