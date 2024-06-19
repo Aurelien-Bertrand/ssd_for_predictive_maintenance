@@ -9,21 +9,17 @@ classdef WindTurbine
         DAMPING_WRT_SUN = 0.9;
         DAMPING_WRT_FIRST_PARALLEL_GEAR = 0.4;
         DAMPING_WRT_SECOND_PARALLEL_GEAR = 0.3;
-
-        NUMBER_OF_BLADES = 3
     end
 
     properties
-        blade_frequency
         carrier_frequency
         number_of_teeth_by_gear
         system_frequencies
     end
 
     methods
-        function obj = WindTurbine(blade_frequency, range_n_teeth)
-            obj.blade_frequency = blade_frequency;
-            obj.carrier_frequency = obj.NUMBER_OF_BLADES * blade_frequency;
+        function obj = WindTurbine(carrier_frequency, range_n_teeth)
+            obj.carrier_frequency = carrier_frequency;
             obj.number_of_teeth_by_gear = obj.randomize_gear_teeth(range_n_teeth);
             obj.system_frequencies = obj.compute_system_frequencies();
         end
@@ -31,6 +27,7 @@ classdef WindTurbine
 
     methods
         function signal = generate_signal(obj, time)
+            % TODO: make these random later
             vsp_11 = 0.004; % First Harmonic
             vrp_11 = 0.004;
             vsp_12 = 0.002; % Second Harmonic

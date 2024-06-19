@@ -1,12 +1,14 @@
 classdef RealisticGenerator
     properties (Constant, Access = private)
-        IMPULSE_PROBABILITY = 0.5 % TODO: not sure if we need this?
+        ROTOR_RPM = [14 25]
     end
+    % TODO: try FFT after adding noise --> for testing check if FFT of cached signal and generated are the same for same seed
+    % TODO: add simple faults and noise
 
     properties
         sampling_frequency
         signal_to_noise_ratio
-        rotor_speed_range
+        rotor_rpm_range
         range_n_teeth
     end
 
@@ -14,21 +16,13 @@ classdef RealisticGenerator
         function obj = RealisticGenerator(...
             sampling_frequency,...
             signal_to_noise_ratio,...
-            rotor_speed_range,...
             range_n_teeth...
         )
-            if nargin < 4 || isempty(rotor_speed_range)
-                % Rotor speed ranges from 120 to 210 m/s
-                % TODO: find paper to proof this
-                rotor_speed_range = [120 210];
-            end
-            if nargin < 5 || isempty(range_n_teeth) % TODO: find realistic values with article!
+            if nargin < 3 || isempty(range_n_teeth) % TODO: find realistic values with article!
                 range_n_teeth = [90 130];
             end
-
             obj.sampling_frequency = sampling_frequency;
             obj.signal_to_noise_ratio = signal_to_noise_ratio;
-            obj.rotor_speed_range = rotor_speed_range;
             obj.range_n_teeth = range_n_teeth;
         end
 
@@ -38,11 +32,11 @@ classdef RealisticGenerator
             
             % parfor i = 1:num_signals
             for i = 1:num_signals
-                % Compute random blade frequency, based on rotor speed (in m/s) and convert to Hz
-                blade_frequency = 1/unifrnd(obj.rotor_speed_range(1), obj.rotor_speed_range(2))*1000;
+                % Compute random carrier frequency, based on rotor rpm and convert to Hz
+                carrier_frequency = unifrnd(obj.ROTOR_RPM(1), obj.ROTOR_RPM(2)) / 60;
 
                 % Generate a wind turbine with random characteristics and its signal for a given time
-                wind_turbine = WindTurbine(blade_frequency, obj.range_n_teeth);
+                wind_turbine = WindTurbine(carrier_frequency, obj.range_n_teeth);
                 disp(wind_turbine)
 
                 % Generate a signal from the wind turbine
