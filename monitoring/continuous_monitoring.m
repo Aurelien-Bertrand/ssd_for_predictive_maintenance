@@ -5,10 +5,10 @@ addpath ./utils/
 addpath ./data_generation/
 
 WINDOW_SIZE = 1000; % Size of the window
-SAMPLING_FREQUENCY = 10; % Amount of samples per second
+SAMPLING_FREQUENCY = 5120; % Amount of samples per second
 SIGNAL_TO_NOISE_RATIO = 0;
 
-number_of_hours = 10;
+number_of_hours = 0.2;
 total_number_of_seconds = number_of_hours * 60 * 60;
 
 total_samples = total_number_of_seconds * SAMPLING_FREQUENCY;
