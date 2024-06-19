@@ -10,10 +10,6 @@ def predict():
     signal = data.get('array', [])
     model = MaintainNet.MaintainNet('MrMaintenance', 2)
     classification = model.predict(signal)
-    print(f"the class is: {classification}")
-
-    # # Convert result to native Python float or int
-    # classification = int(classification) if classification.is_integer() else float(classification)
 
     return jsonify(result=classification)
 
