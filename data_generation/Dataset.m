@@ -1,6 +1,6 @@
 classdef Dataset
     properties (Constant, Access = private)
-        CACHE_PATH = "../_cache/"
+        CACHE_PATH = "./_cache/"
         DATASET_PATH = strcat(Dataset.CACHE_PATH, "dataset.mat")
         DATA_PATH = strcat(Dataset.CACHE_PATH, "data.csv")
     end
