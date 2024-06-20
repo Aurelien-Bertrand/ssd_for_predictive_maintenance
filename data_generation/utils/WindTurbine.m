@@ -23,9 +23,7 @@ classdef WindTurbine
             obj.number_of_teeth_by_gear = obj.randomize_gear_teeth(range_n_teeth);
             obj.system_frequencies = obj.compute_system_frequencies();
         end
-    end
 
-    methods
         function signal = generate_signal(obj, time)
             % TODO: make these random later
             vsp_11 = 0.004; % First Harmonic
