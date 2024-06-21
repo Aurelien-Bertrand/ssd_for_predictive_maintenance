@@ -7,8 +7,8 @@ function [numOfComps,meanPComp,varPComp,stftPComp,freqs] = keyFigsWindow(compone
 % The given components need to be saved along the columns, e.g. the first
 % column contains the first component.
 
-    numOfComps = size(components,2);
-    for i=1:numOfComps
+    numOfComps = size(components,2)-1;
+    for i=1:numOfComps+1
         if i==7
             a=0;
         end
