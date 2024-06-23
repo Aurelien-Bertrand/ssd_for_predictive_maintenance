@@ -20,7 +20,7 @@ additional_component_frequency_range = [500 500];
 % You can load the dataset instead of generating from scratch
 dataset = Dataset.load();
 
-if isempty(dataset)
+if isempty(dataset) || true
     disp("Generating data...")
     generator = SimpleGenerator(...
         num_components_range,...

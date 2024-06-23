@@ -50,7 +50,7 @@ classdef SimpleGenerator < DataGenerator
                 random_state = [];
             end
             
-            obj@DataGenerator(sampling_frequency, signal_to_noise_ratio, impulse_probability, fault_probability, [], random_state);
+            obj@DataGenerator(sampling_frequency, signal_to_noise_ratio, impulse_probability, fault_probability, random_state);
 
             obj.num_components_range = num_components_range;
             obj.frequency_range = frequency_range;

@@ -6,7 +6,6 @@ classdef DataGenerator
     end
 
     properties (Access = private)
-        fault_flag
         impulse_probability
         fault_probability
     end
@@ -17,18 +16,13 @@ classdef DataGenerator
             signal_to_noise_ratio,...
             impulse_probability,...
             fault_probability,...
-            fault_flag,...
             random_state...
         )
-            if nargin < 5 || isempty(fault_flag)
-                fault_flag = false;
-            end
-            if nargin < 6 || isempty(random_state)
+            if nargin < 5 || isempty(random_state)
                 random_state = [];
             end
             obj.sampling_frequency = sampling_frequency;
             obj.signal_to_noise_ratio = signal_to_noise_ratio;
-            obj.fault_flag = fault_flag;
             obj.impulse_probability = impulse_probability;
             obj.fault_probability = fault_probability;
             obj.random_state = random_state;
@@ -70,14 +64,17 @@ classdef DataGenerator
         end
 
         % TODO: here, impulse strength and specific faults should be worse over time!
-        function [faulty_signal, fault_type] = add_faults_to_signal(obj, signal, time)
+        function [faulty_signal, fault_type] = add_faults_to_signal(obj, signal, time, fault_flag)
+            if nargin < 4 || isempty(fault_flag)
+                fault_flag = false;
+            end
             faulty_signal = signal;
             fault_type = FaultTypes.HEALTHY;
-            if obj.fault_flag || rand() <= obj.impulse_probability
+            if fault_flag || rand() <= obj.impulse_probability
                 faulty_signal = signal + generate_impulse(length(signal));
                 fault_type = FaultTypes.IMPULSE;
             end
-            if obj.fault_flag || rand() <= obj.fault_probability
+            if fault_flag || rand() <= obj.fault_probability
                 [faults, specific_fault_type] = obj.generate_specific_faults(time);
                 faulty_signal = faulty_signal + faults;
                 fault_type = obj.update_fault_type(fault_type, specific_fault_type);
