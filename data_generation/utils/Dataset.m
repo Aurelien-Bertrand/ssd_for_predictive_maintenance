@@ -8,22 +8,23 @@ classdef Dataset
     properties
         generator
         time
-        signals
+        healthy_signals
+        faulty_signals
         fault_types
         components
     end
     
     methods
-        function obj = Dataset(generator, time, signals, fault_types, components)
+        function obj = Dataset(generator, time, healthy_signals, faulty_signals, fault_types, components)
+            if nargin < 6
+                components = [];
+            end
             obj.generator = generator;
             obj.time = time;
-            obj.signals = signals;
+            obj.healthy_signals = healthy_signals;
+            obj.faulty_signals = faulty_signals;
             obj.fault_types = fault_types;
-            if nargin < 5
-                obj.components = [];
-            else
-                obj.components = components;
-            end
+            obj.components = components;
         end
 
         function save(obj)
@@ -34,16 +35,16 @@ classdef Dataset
 
         function save_data(obj)
             disp("Saving data...")
-            data = array2table([obj.signals obj.fault_types]);
+            data = array2table([obj.faulty_signals obj.fault_types]);
             writetable(data, obj.DATA_PATH)
             disp("Data saved.")
         end
 
         function plot(obj)
             addpath("./plotting")
-            if size(obj.signals, 1) <= 10
+            if size(obj.faulty_signals, 1) <= 10
                 disp("Plotting signals...")
-                plot_raw_signals(obj.time, obj.signals)                
+                plot_raw_signals(obj.time, obj.faulty_signals)                
             end
         end
     end
