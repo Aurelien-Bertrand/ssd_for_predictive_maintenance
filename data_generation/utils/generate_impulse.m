@@ -1,5 +1,5 @@
 function impulse_signal = generate_impulse(n)
-    impulse_strength = unifrnd(1, 10);
+    impulse_strength = unifrnd(0, 10);
 
     step_size = randi([floor(n / 30), floor(n / 15)]);
 
