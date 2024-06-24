@@ -3,7 +3,6 @@ NeuralNet/data.csv
 NeuralNet/test.csv
 NeuralNet/data/*
 __pycache__/
-/data
 /env
 MaintainNet.ipynb
 utils/client.m
