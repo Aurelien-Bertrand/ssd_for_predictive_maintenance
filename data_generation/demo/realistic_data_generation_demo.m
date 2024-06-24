@@ -8,7 +8,7 @@ random_state = []; % You can set this, in which case the signals will always loo
 % You can load the dataset instead of generating from scratch
 dataset = Dataset.load();
 
-if isempty(dataset) || true
+if isempty(dataset)
     generator = RealisticGenerator(sampling_frequency, signal_to_noise_ratio, [], [], [], random_state);
     
     dataset = generator.generate_dataset(10, 0, 10);

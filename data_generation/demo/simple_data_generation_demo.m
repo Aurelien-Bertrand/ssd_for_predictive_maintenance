@@ -7,7 +7,7 @@ frequency_range = [1 100];
 amplitude_range = [1 5];
 phase_range = [0 1];
 signal_to_noise_ratio = 0;
-random_state = []; % You can set this, in which case the signals will always look the same
+random_state =101; % You can set this, in which case the signals will always look the same
 intermittent_prob = 0.33;
 combined_prob = 0.33;
 allow_intermittent = true;
@@ -20,7 +20,7 @@ additional_component_frequency_range = [300 600];
 % You can load the dataset instead of generating from scratch
 dataset = Dataset.load();
 
-if isempty(dataset) || true
+if isempty(dataset)
     disp("Generating data...")
     generator = SimpleGenerator(...
         num_components_range,...
@@ -51,4 +51,4 @@ if isempty(dataset) || true
     
 end
 
-% dataset.plot()
+dataset.plot()
