@@ -1,5 +1,6 @@
-addpath('./singular_spectrum_decomposition/');
-addpath('./plotting/');
+addpath ./singular_spectrum_decomposition
+addpath ./plotting
+
 data = readmatrix('./NeuralNet/data/test.csv');
 
 p = 100;
@@ -20,7 +21,6 @@ for i = 1:m
     target = data(i, 1001);    % Extract the class of the ith signal
 
     % Do SSD decomposition
-    % signal_components = SSD(signal, 1000, 0.01, 10);
     signal_components = rSSD(signal, 1000, 0.01, 10);
 
     % Find the residual
@@ -29,7 +29,7 @@ for i = 1:m
     signal_components = [signal_components; residual];
 
     % Plot the components
-    % plot_components(signal_components)
+    plot_components(signal_components)
 
     num_components = size(signal_components, 1);
 
