@@ -1,6 +1,3 @@
-% TODO: could use a 0.5Hz sampling interval and a 10-minute averaging interval
-% TODO: somehow relate to SCADA - so 10 minutes averages?
-
 addpath ./utils/
 addpath ./data_generation/
 
@@ -8,7 +5,7 @@ WINDOW_SIZE = 1000; % Size of the window
 SAMPLING_FREQUENCY = 5120; % Amount of samples per second
 SIGNAL_TO_NOISE_RATIO = 0;
 
-number_of_hours = 0.2;
+number_of_hours = 0.2; % TODO: this is a parameter that the user should give (could be in minutes)
 total_number_of_seconds = number_of_hours * 60 * 60;
 
 total_samples = total_number_of_seconds * SAMPLING_FREQUENCY;
