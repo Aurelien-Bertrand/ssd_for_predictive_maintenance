@@ -3,11 +3,8 @@ NeuralNet/data.csv
 NeuralNet/test.csv
 NeuralNet/data/*
 __pycache__/
-data
+/data
 /env
 MaintainNet.ipynb
 utils/client.m
-/_cache
-_cache/data.csv
-_cache/dataset.mat
 experiments/NN_data_raw.csv
