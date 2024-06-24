@@ -1,7 +1,7 @@
 addpath ./data_generation
 addpath ./data_generation/utils/
 
-sampling_frequency = 2560;
+sampling_frequency = 5120;
 signal_to_noise_ratio = 10;
 random_state = []; % You can set this, in which case the signals will always look the same
 
