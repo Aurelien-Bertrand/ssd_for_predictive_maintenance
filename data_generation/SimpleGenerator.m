@@ -144,7 +144,7 @@ classdef SimpleGenerator < DataGenerator
                     allow_combined = obj.allow_multiple_combined;
                 end
                 if ~generate_new_component && generate_intermittent && num_components > 1
-                    component = truncate_signal(component);
+                    component = truncate_signal(component, obj.random_state);
                     allow_intermittent = obj.allow_multiple_intermittent;
                 end
                 components(i, :) = component;
