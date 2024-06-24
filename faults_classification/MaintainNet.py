@@ -11,6 +11,7 @@ import math
 from tqdm import tqdm
 
 from faults_classification._map_class_index_to_name import map_class_index_to_name
+from sklearn.metrics import precision_recall_fscore_support, confusion_matrix
 
 PRINTER = False
 PATIENCE = 3
@@ -155,14 +156,14 @@ class MaintainNet(nn.Module):
                     loss = self.criterion(outputs, targets)
                     validation_loss += loss.item()
 
-                    if validation_loss >= best_loss:
-                        patience_count += 1
-                        if patience_count == PATIENCE:
-                            print('Early stopping enabled')
-                            break
-                    else:
-                        best_loss = validation_loss
-                        patience_count = 0
+                    # if validation_loss >= best_loss:
+                    #     patience_count += 1
+                    #     if patience_count == PATIENCE:
+                    #         print('Early stopping enabled')
+                    #         break
+                    # else:
+                    #     best_loss = validation_loss
+                    #     patience_count = 0
 
             training_loss /= len(self.train_loader)
             validation_loss /= len(self.validation_loader)
@@ -177,6 +178,10 @@ class MaintainNet(nn.Module):
         test_loss = 0
         correct = 0
         total = 0
+
+        all_targets = []
+        all_predicted = []
+
         with torch.no_grad():
             for inputs, targets in tqdm(self.test_loader, desc="Testing", leave=False):
                 inputs = inputs.to(self.device)
@@ -192,9 +197,25 @@ class MaintainNet(nn.Module):
                 total += targets.size(0)
                 correct += (predicted == targets).sum().item()
 
+                all_targets.extend(targets.cpu().numpy())
+                all_predicted.extend(predicted.cpu().numpy())
+
         test_loss /= len(self.test_loader)
         accuracy = 100 * correct / total
-        print(f'Test Loss: {test_loss}, Accuracy: {accuracy}%')
+
+        # Calculate precision, recall, and F1-score
+        precision, recall, f1, _ = precision_recall_fscore_support(all_targets, all_predicted, average='weighted')
+        
+        # Calculate confusion matrix
+        conf_matrix = confusion_matrix(all_targets, all_predicted)
+
+        print(f'Test Loss: {test_loss}')
+        print(f'Accuracy: {accuracy}%')
+        print(f'Precision: {precision}')
+        print(f'Recall: {recall}')
+        print(f'F1-Score: {f1}')
+        print('Confusion Matrix:')
+        print(conf_matrix)
 
     def predict(self, input):
         self.eval()  # Set the model to evaluation mode

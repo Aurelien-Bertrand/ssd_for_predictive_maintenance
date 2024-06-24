@@ -1,14 +1,20 @@
 from flask import Flask, request, jsonify
-import faults_classification.MaintainNet as MaintainNet
+import MaintainNet as MaintainNet
 import math
+import torch
 
 app = Flask(__name__)
+
+model = MaintainNet.MaintainNet('MrMaintenance', 4)
+model.load_state_dict(torch.load('./models/simplemodel.pth'))
+model.eval()
 
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json()
     signal = data.get('array', [])
-    model = MaintainNet.MaintainNet('MrMaintenance', 2)
+
+
     classification = model.predict(signal)
 
     return jsonify(result=classification)

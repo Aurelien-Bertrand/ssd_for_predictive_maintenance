@@ -83,10 +83,10 @@ while (remen > th) && (k1 < maxNumberofComponents)
         end
 
         if first_comp
-            [U,S,V] = rsvd(Mm, 50);
+            [U,S,V] = rsvd(M, 50);
             first_comp = 0;
         else
-            [U,S,V] = rsvd(Mm, 10);
+            [U,S,V] = rsvd(M, 10);
         end
 
         U(:,l+1:end) = [];

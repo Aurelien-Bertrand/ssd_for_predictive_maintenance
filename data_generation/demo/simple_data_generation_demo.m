@@ -15,7 +15,7 @@ allow_combined = true;
 allow_multiple_intermittent = true;
 allow_multiple_combined = true;
 
-additional_component_frequency_range = [500 500];
+additional_component_frequency_range = [300 600];
 
 % You can load the dataset instead of generating from scratch
 dataset = Dataset.load();
@@ -35,9 +35,9 @@ if isempty(dataset) || true
         allow_combined,...
         allow_multiple_intermittent,...
         allow_multiple_combined,...
-        [],...
+        [],... % impulse prob
         additional_component_frequency_range,...
-        [],...
+        [],... % additional component prob
         random_state...
     );
     dataset = generator.generate_dataset(10, 0, 1);
@@ -46,7 +46,9 @@ if isempty(dataset) || true
     dataset.save();
 
     % Alternatively, we can save the data only
-    dataset.save_data()
+    dataset.save_data();
+    dataset.fault_types;
+    
 end
 
-dataset.plot()
+% dataset.plot()

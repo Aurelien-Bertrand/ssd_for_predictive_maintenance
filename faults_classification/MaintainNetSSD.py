@@ -22,7 +22,7 @@ class MaintainNetSSD(nn.Module):
 
         # Define convolutional layers
         self.conv_layers = nn.ModuleList([
-            nn.Conv1d(in_channels=10, out_channels=16, kernel_size=64, padding=32),  # Initial layer for multiple channels
+            nn.Conv1d(in_channels=11, out_channels=16, kernel_size=64, padding=32),  # Initial layer for multiple channels
             nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, padding=1),
             nn.Conv1d(in_channels=32, out_channels=64, kernel_size=3, padding=1),
             nn.Conv1d(in_channels=64, out_channels=64, kernel_size=3, padding=1),
@@ -47,6 +47,35 @@ class MaintainNetSSD(nn.Module):
         self.linear_input_size = 7
         # Define the linear layer
         self.classifier = nn.Linear(self.linear_input_size, num_classes)
+
+        # # Define convolutional layers
+        # self.conv_layers = nn.ModuleList([
+        #     nn.Conv1d(in_channels=11, out_channels=32, kernel_size=64, padding=32),  # Initial layer for multiple channels
+        #     nn.Conv1d(in_channels=32, out_channels=64, kernel_size=3, padding=1),
+        #     nn.Conv1d(in_channels=64, out_channels=128, kernel_size=3, padding=1),
+        #     nn.Conv1d(in_channels=128, out_channels=64, kernel_size=3, padding=1),
+        #     nn.Conv1d(in_channels=64, out_channels=32, kernel_size=3, padding=1),
+        #     nn.Conv1d(in_channels=32, out_channels=16, kernel_size=3, padding=1),
+        #     nn.Conv1d(in_channels=16, out_channels=1, kernel_size=3, padding=1),  # Final layer to reduce channels
+        # ])
+
+        # # Define batch normalization layers
+        # self.batch_norm_layers = nn.ModuleList([
+        #     nn.BatchNorm1d(num_features=x.out_channels) for x in self.conv_layers
+        # ])
+
+        # # Assuming the last convolutional layer outputs at 500 time steps due to max pooling
+        # final_time_steps = 1000  # Start with the initial time steps
+        # for _ in range(len(self.conv_layers)):  # Calculating the size after each pooling
+        #     final_time_steps = (final_time_steps + 1) // 2  # Adjusting for each pooling layer
+
+        # print(final_time_steps)
+        # # Calculate size for the linear layer to match the output size of the last convolutional layer
+        # self.linear_input_size = final_time_steps # Adjusted for number of output channels from the last conv layer
+        # self.linear_input_size = 7
+        # # Define the linear layer
+        # self.classifier = nn.Linear(self.linear_input_size, num_classes)
+
 
         # Loss function and optimizer
         self.criterion = nn.CrossEntropyLoss()
@@ -127,15 +156,15 @@ class MaintainNetSSD(nn.Module):
                     loss = self.criterion(outputs, targets)
                     validation_loss += loss.item()
 
-                    # Early stopping
-                    if validation_loss >= best_loss:
-                        patience_count += 1
-                        if patience_count == PATIENCE:
-                            print('Early stopping enabled')
-                            break
-                    else:
-                        best_loss == validation_loss
-                        patience_count == 0
+                    # # Early stopping
+                    # if validation_loss >= best_loss:
+                    #     patience_count += 1
+                    #     if patience_count == PATIENCE:
+                    #         print('Early stopping enabled')
+                    #         break
+                    # else:
+                    #     best_loss == validation_loss
+                    #     patience_count == 0
 
             training_loss /= len(self.train_loader)
             validation_loss /= len(self.validation_loader)
