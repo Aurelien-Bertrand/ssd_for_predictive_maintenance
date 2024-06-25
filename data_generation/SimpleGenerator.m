@@ -174,7 +174,7 @@ classdef SimpleGenerator < DataGenerator
     end
 
     methods (Access = private)
-        function [signal, frequency] = generate_random_signal(obj, time, frequency_range, amplitude_range, phase_range)
+        function [signal, frequency] = generate_random_signal(~, time, frequency_range, amplitude_range, phase_range)
             amplitude = unifrnd(amplitude_range(1), amplitude_range(2));
             frequency = unifrnd(frequency_range(1), frequency_range(2));
             theta = unifrnd(phase_range(1), phase_range(2));
