@@ -21,7 +21,7 @@ for i = 1:WINDOW_SIZE:length(time)-WINDOW_SIZE+1
     
     start_time = window_time(1);
     end_time = window_time(end);
-    
+
     data = generator.generate_dataset(1, start_time, end_time);
     fault = string(model.predict(data.faulty_signals));
 
