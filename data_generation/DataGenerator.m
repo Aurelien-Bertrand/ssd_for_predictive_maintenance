@@ -33,6 +33,10 @@ classdef DataGenerator < handle
                 noisy_signal = signal;
                 return
             end
+            if ~isempty(obj.random_state)
+                rng(obj.random_state);
+            end
+
             signal_power = mean(signal.^2);
             noise_power = signal_power / obj.signal_to_noise_ratio;
             noise = sqrt(noise_power) * randn(size(signal));
