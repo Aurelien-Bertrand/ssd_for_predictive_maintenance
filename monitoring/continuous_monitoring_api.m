@@ -1,5 +1,6 @@
 addpath ./utils/
 addpath ./data_generation/
+addpath ./data_generation/utils/
 
 url = 'http://127.0.0.1:5000/predict';
 
@@ -13,7 +14,8 @@ total_number_of_seconds = number_of_hours * 60 * 60;
 total_samples = total_number_of_seconds * SAMPLING_FREQUENCY;
 time = linspace(0, total_number_of_seconds, total_samples);
 
-generator = RealisticGenerator(SAMPLING_FREQUENCY, SIGNAL_TO_NOISE_RATIO);
+random_state = randi(2^31) - 1;
+generator = RealisticGenerator(SAMPLING_FREQUENCY, SIGNAL_TO_NOISE_RATIO, [], [], [], random_state, true);
 
 for i = 1:WINDOW_SIZE:length(time)-WINDOW_SIZE+1
     window_time = time(i:i+WINDOW_SIZE-1);
