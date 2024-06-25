@@ -1,24 +1,17 @@
 function plot_components(components)
-    t = 1:1000;
-    components = [components; residual];
-    figure;
-    hold on;
-    for i = 1:11
-        subplot(11, 1, i);
-        plot(t, components(i, :));
-        title(['Series ' num2str(i)]);
-    length(components)
-    % Plot each time series
-    for i = 1:size(components, 1)
-        subplot(11, 1, i);  % Create a subplot grid of 10 rows and 1 column, and select the ith subplot
-        plot(t, components(i, :));  % Plot the ith time series
-        title(['Series ' num2str(i)]);  % Title each subplot
-        xlabel('Time');
-        ylabel('Value');
+    % Assuming components is a matrix where each row is a time series signal
+    num_series = size(components, 1);  % Number of time series signals
+    t = 1:size(components, 2);  % Assuming time indices if not provided in t
+    
+    figure;  % Create a new figure
+    
+    for i = 1:num_series
+        subplot(num_series, 1, i);  % Create subplot grid of num_series rows, 1 column, and select the i-th subplot
+        plot(t, components(i, :));  % Plot the i-th time series signal
+        title(['Series ' num2str(i)]);  % Title for each subplot
+        xlabel('Time');  % X-axis label
+        ylabel('Value');  % Y-axis label
     end
-    xlabel('Time');
-    ylabel('Value');
-    title('10 Time Series Plot');
-    legend('Series 1', 'Series 2', 'Series 3', 'Series 4', 'Series 5', 'Series 6', 'Series 7', 'Series 8', 'Series 9', 'Series 10');
-    hold off;
+    
+    sgtitle('Time Series Plot');  % Overall title for the entire figure
 end

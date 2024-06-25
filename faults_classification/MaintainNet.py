@@ -11,7 +11,9 @@ import math
 from tqdm import tqdm
 
 from faults_classification._map_class_index_to_name import map_class_index_to_name
-from sklearn.metrics import precision_recall_fscore_support, confusion_matrix
+from sklearn.metrics import precision_recall_fscore_support, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 PRINTER = False
 PATIENCE = 3
@@ -240,3 +242,43 @@ class MaintainNet(nn.Module):
             output = np.argmax(output)
             
             return map_class_index_to_name(int(output))
+
+    def evaluate_model(self):
+        self.eval()
+        all_preds = []
+        all_labels = []
+        class_labels = [0, 1, 2, 3]
+        with torch.no_grad():
+            for inputs, labels in tqdm(self.validation_loader, desc="Evaluating", leave=False):
+                inputs = inputs.to(self.device)
+                labels = labels.to(self.device).long()
+
+                outputs = self(inputs)
+                outputs = outputs.squeeze(dim=1)
+
+                _, preds = torch.max(outputs, 1)
+                all_preds.extend(preds.cpu().numpy())
+                all_labels.extend(labels.cpu().numpy())
+
+        accuracy = accuracy_score(all_labels, all_preds)
+        precision = precision_score(all_labels, all_preds, average='weighted')
+        recall = recall_score(all_labels, all_preds, average='weighted')
+        f1 = f1_score(all_labels, all_preds, average='weighted')
+        conf_matrix = confusion_matrix(all_labels, all_preds)
+
+        print(f"Accuracy: {accuracy:.4f}")
+        print(f"Precision: {precision:.4f}")
+        print(f"Recall: {recall:.4f}")
+        print(f"F1 Score: {f1:.4f}")
+        print(f"Confusion Matrix:\n{conf_matrix}")
+
+        # Plot confusion matrix
+        plt.figure(figsize=(10, 7))
+        sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=class_labels, yticklabels=class_labels)
+        plt.xlabel('Predicted Labels')
+        plt.ylabel('True Labels')
+        plt.title('Confusion Matrix')
+        plt.show()
+
+        return accuracy, precision, recall, f1, conf_matrix
+    

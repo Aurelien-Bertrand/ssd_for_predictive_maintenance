@@ -9,6 +9,9 @@ import torch.optim as optim
 from torch.utils.data import Dataset, TensorDataset, DataLoader
 import math
 from tqdm import tqdm
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 PRINTER = False
 PATIENCE = 3
@@ -226,6 +229,44 @@ class MaintainNetSSD(nn.Module):
             return input_signal, output_component, target_component
 
 
+    def evaluate_model(self):
+        self.eval()  # Set the model to evaluation mode
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+        all_targets = []
+        all_predictions = []
+
+        with torch.no_grad():
+            for inputs, targets in self.validation_loader:
+                inputs = inputs.to(device)
+                targets = targets.to(device)
+                
+                outputs = self(inputs)
+                _, predictions = torch.max(outputs, dim=1)
+                
+                all_targets.extend(targets.cpu().numpy())
+                all_predictions.extend(predictions.cpu().numpy())
+
+        accuracy = accuracy_score(all_targets, all_predictions)
+        precision = precision_score(all_targets, all_predictions, average='weighted')
+        recall = recall_score(all_targets, all_predictions, average='weighted')
+        f1 = f1_score(all_targets, all_predictions, average='weighted')
+
+        # Compute the confusion matrix
+        cm = confusion_matrix(all_targets, all_predictions)
+        plt.figure(figsize=(10, 7))
+        sns.heatmap(cm, annot=True, fmt="d", cmap='Blues', xticklabels=[0,1,2,3], yticklabels=[0,1,2,3])
+        plt.xlabel('Predicted Labels')
+        plt.ylabel('True Labels')
+        plt.title('Confusion Matrix')
+        plt.show()
+        
+        print(f'Accuracy: {accuracy}')
+        print(f'Precision: {precision}')
+        print(f'Recall: {recall}')
+        print(f'F1 Score: {f1}')
+
+        return accuracy, precision, recall, f1
 
 class SignalDataset(Dataset):
     def __init__(self, dataframe):

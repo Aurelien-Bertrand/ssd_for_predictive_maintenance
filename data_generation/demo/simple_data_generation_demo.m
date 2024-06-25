@@ -47,7 +47,7 @@ if isempty(dataset)
     dataset.save();
 
     % Alternatively, we can save the data only
-    dataset.save_data();
+    % dataset.save_data();
     
     % Or we can also save only healthy / faulty data
     dataset.save_healthy_faulty();
