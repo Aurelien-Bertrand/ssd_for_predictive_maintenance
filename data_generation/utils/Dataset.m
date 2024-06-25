@@ -6,7 +6,6 @@ classdef Dataset
         HEALHTY_DATA_PATH = strcat(Dataset.CACHE_PATH, "data_healthy.csv")
         FAULTY_DATA_PATH = strcat(Dataset.CACHE_PATH, "data_faulty.csv")
         NOISY_DATA_PATH = strcat(Dataset.CACHE_PATH, "data_noisy.csv")
-
     end
 
     properties
