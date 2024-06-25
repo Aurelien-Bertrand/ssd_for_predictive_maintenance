@@ -1,4 +1,4 @@
-classdef WindTurbine
+classdef WindTurbine < handle
     % This generator simulates vibration signals in a specific gearbox of a wind turbine
     % TODO: mention what wind turbine it is!
     properties (Access = private, Constant)
@@ -15,36 +15,54 @@ classdef WindTurbine
         random_state
     end
 
+    properties (Access = private)
+        dynamic_update
+        A
+        B
+    end
+
     methods
-        function obj = WindTurbine(carrier_frequency, range_n_teeth, random_state)
+        function obj = WindTurbine(carrier_frequency, range_n_teeth, random_state, dynamic_update)
+            obj.random_state = random_state;
             obj.carrier_frequency = carrier_frequency;
             obj.number_of_teeth_by_gear = obj.randomize_gear_teeth(range_n_teeth);
             obj.system_frequencies = obj.compute_system_frequencies();
-            obj.random_state = random_state;
+
+            obj.dynamic_update = dynamic_update;
+            obj.A = 0;
+            obj.B = 0;
         end
 
-        function signal = generate_signal(obj, time, previous_A, previous_B)
-            if nargin < 3 || isempty(previous_A)
-                previous_A = 0;
-            end
-            if nargin < 4 || isempty(previous_B)
-                previous_B = 0;
-            end
-
+        function [signal, A, B] = generate_signal(obj, time, A, B)
             if ~isempty(obj.random_state)
                 rng(obj.random_state);
             end
 
-            A = unifrnd(previous_A, 1);
-            B = unifrnd(previous_B, 1);
+            if nargin < 3 || isempty(A)
+                upper_bound_A = 1;
+                if obj.dynamic_update
+                    upper_bound_A = obj.A + (1 - obj.A) * 0.2 * rand();
+                end
+                A = unifrnd(obj.A, upper_bound_A);
+                obj.A = A;
+            end
+            if nargin < 4 || isempty(B)
+                upper_bound_B = 1;
+                if obj.dynamic_update
+                    upper_bound_B = obj.B + (1 - obj.B) * 0.2 * rand();
+                end
+                B = unifrnd(obj.B, upper_bound_B);
+                obj.B = B;
+            end
+
             meshing_frequency_parallel_gears = sum(obj.system_frequencies(4:5));
             
             signal = zeros(size(time));
             for k = 1:obj.NUM_HARMONICS
                 signal = signal + ...
-                    (1 + A*cos(2*pi*obj.system_frequencies(3)*time)) .* ...
+                    (1 + obj.A*cos(2*pi*obj.system_frequencies(3)*time)) .* ...
                     cos(k*2*pi*meshing_frequency_parallel_gears*time + ...
-                        B*cos(2*pi*obj.system_frequencies(3)*time + obj.MODULATING_SIGNAL_PHASE_SHIFT) +  ...
+                        obj.B*cos(2*pi*obj.system_frequencies(3)*time + obj.MODULATING_SIGNAL_PHASE_SHIFT) +  ...
                         obj.ADDITIONAL_PHASE_SHIFT...
                     );
             end
@@ -52,6 +70,18 @@ classdef WindTurbine
             pass_effect_vibration_signal = 1 - cos(2*pi*3*time*ring_frequency);
 
             signal = signal .* pass_effect_vibration_signal;
+        end
+
+        function fault_type = get_fault_type(obj)
+            if obj.A ~= 0 && obj.B ~= 0
+                fault_type = FaultTypes.FREQUENCY_AND_AMPLITUDE_MODULATION;
+            elseif obj.A ~= 0
+                fault_type = FaultTypes.AMPLITUDE_MODULATION;
+            elseif obj.B ~= 0
+                fault_type = FaultTypes.FREQUENCY_MODULATION;
+            else
+                fault_type = FaultTypes.HEALTHY;
+            end
         end
     end
 
