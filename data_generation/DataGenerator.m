@@ -20,13 +20,19 @@ classdef DataGenerator < handle
         end
 
         function time = generate_time_vector(obj, start_time, end_time)
-            time = start_time:1/obj.sampling_frequency:end_time;
+            % time = start_time:1/obj.sampling_frequency:end_time;
+            time = linspace(start_time, end_time, 1000);
         end
 
         function [noisy_and_faulty_signal, fault_type] = add_noise_and_faults_to_signal(obj, signal, time)
             [faulty_signal, fault_type] = obj.add_faults_to_signal(signal, time);
             noisy_and_faulty_signal = obj.add_noise_to_signal(faulty_signal);
         end
+
+        function noisy_signal = add_just_noise_to_signal(obj, signal)
+            noisy_signal = obj.add_noise_to_signal(signal);
+        end
+
     end
 
     methods (Access = private)

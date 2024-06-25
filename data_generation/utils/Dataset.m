@@ -3,6 +3,10 @@ classdef Dataset
         CACHE_PATH = "./_cache/data/"
         DATASET_PATH = strcat(Dataset.CACHE_PATH, "dataset.mat")
         DATA_PATH = strcat(Dataset.CACHE_PATH, "data.csv")
+        HEALHTY_DATA_PATH = strcat(Dataset.CACHE_PATH, "data_healthy.csv")
+        FAULTY_DATA_PATH = strcat(Dataset.CACHE_PATH, "data_faulty.csv")
+        NOISY_DATA_PATH = strcat(Dataset.CACHE_PATH, "data_noisy.csv")
+
     end
 
     properties
@@ -10,18 +14,20 @@ classdef Dataset
         time
         healthy_signals
         faulty_signals
+        noisy_signals
         fault_types
         components
     end
     
     methods
-        function obj = Dataset(generator, time, healthy_signals, faulty_signals, fault_types, components)
+        function obj = Dataset(generator, time, healthy_signals, faulty_signals, noisy_signals, fault_types, components)
             if nargin < 6
                 components = [];
             end
             obj.generator = generator;
             obj.time = time;
             obj.healthy_signals = healthy_signals;
+            obj.noisy_signals = noisy_signals;
             obj.faulty_signals = faulty_signals;
             obj.fault_types = fault_types;
             obj.components = components;
@@ -40,6 +46,21 @@ classdef Dataset
             disp("Saving data...")
             data = array2table([obj.faulty_signals obj.fault_types]);
             writetable(data, obj.DATA_PATH)
+            disp("Data saved.")
+        end
+
+        function save_healthy_faulty(obj)
+            disp("Saving healthy/faulty data...")
+
+            data = array2table(obj.faulty_signals);
+            writetable(data, obj.FAULTY_DATA_PATH)
+
+            data = array2table(obj.healthy_signals);
+            writetable(data, obj.HEALHTY_DATA_PATH)
+            
+            data = array2table(obj.noisy_signals);
+            writetable(data, obj.NOISY_DATA_PATH)
+
             disp("Data saved.")
         end
 

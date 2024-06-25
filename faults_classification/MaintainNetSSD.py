@@ -22,7 +22,7 @@ class MaintainNetSSD(nn.Module):
 
         # Define convolutional layers
         self.conv_layers = nn.ModuleList([
-            nn.Conv1d(in_channels=11, out_channels=16, kernel_size=64, padding=32),  # Initial layer for multiple channels
+            nn.Conv1d(in_channels=7, out_channels=16, kernel_size=64, padding=32),  # Initial layer for multiple channels
             nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, padding=1),
             nn.Conv1d(in_channels=32, out_channels=64, kernel_size=3, padding=1),
             nn.Conv1d(in_channels=64, out_channels=64, kernel_size=3, padding=1),
