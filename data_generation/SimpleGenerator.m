@@ -16,6 +16,12 @@ classdef SimpleGenerator < DataGenerator
         allow_multiple_intermittent
         allow_multiple_combined
         additional_component_frequency_range
+        impulse_probability
+        fault_probability
+    end
+
+    properties (Access = private)
+        use_persistent_faults
     end
 
     methods
@@ -35,7 +41,8 @@ classdef SimpleGenerator < DataGenerator
             impulse_probability,...
             additional_component_frequency_range,...
             fault_probability,...
-            random_state...
+            random_state,...
+            use_persistent_faults...
         )
             if nargin < 13 || isempty(impulse_probability)
                 impulse_probability = 0.2;
@@ -49,8 +56,11 @@ classdef SimpleGenerator < DataGenerator
             if nargin < 16
                 random_state = [];
             end
+            if nargin < 17 || isempty(use_persistent_faults)
+                use_persistent_faults = false;
+            end
             
-            obj@DataGenerator(sampling_frequency, signal_to_noise_ratio, impulse_probability, fault_probability, random_state);
+            obj@DataGenerator(sampling_frequency, signal_to_noise_ratio, random_state);
 
             obj.num_components_range = num_components_range;
             obj.frequency_range = frequency_range;
@@ -63,9 +73,16 @@ classdef SimpleGenerator < DataGenerator
             obj.allow_multiple_intermittent = allow_multiple_intermittent;
             obj.allow_multiple_combined = allow_multiple_combined;
             obj.additional_component_frequency_range = additional_component_frequency_range;
+            obj.impulse_probability = impulse_probability;
+            obj.fault_probability = fault_probability;
+            obj.use_persistent_faults = use_persistent_faults;
         end
 
-        function dataset = generate_dataset(obj, num_signals, start_time, end_time)
+        function dataset = generate_dataset(obj, num_signals, start_time, end_time, fault_flag)
+            if nargin < 5 || isempty(fault_flag)
+                fault_flag = false;
+            end
+
             time = obj.generate_time_vector(start_time, end_time);
             components = cell(num_signals, 1);
             healthy_signals = zeros(num_signals, length(time));
@@ -83,21 +100,6 @@ classdef SimpleGenerator < DataGenerator
                 components{i} = signal_components;
             end
             dataset = Dataset(obj, time, healthy_signals, faulty_signals, fault_types, components);
-        end
-
-        function [faults, specific_fault_type] = generate_specific_faults(obj, time)
-            faults = obj.generate_signal(time, [1 1], obj.additional_component_frequency_range);
-            specific_fault_type = FaultTypes.ADDITIONAL_COMPONENT;
-        end
-    end
-
-    methods (Access = private)
-        function [signal, frequency] = generate_random_signal(obj, time, frequency_range, amplitude_range, phase_range)
-            amplitude = unifrnd(amplitude_range(1), amplitude_range(2));
-            frequency = unifrnd(frequency_range(1), frequency_range(2));
-            theta = unifrnd(phase_range(1), phase_range(2));
-            
-            signal = amplitude * sin(2*pi*frequency*time + theta);
         end
 
         function [signal, components] = generate_signal(obj, time, num_components_range, frequency_range)
@@ -153,6 +155,32 @@ classdef SimpleGenerator < DataGenerator
             [~, idx] = sort(frequencies, "descend");
             components = components(idx, :);
             signal = sum(components, 1);
+        end
+
+        function [faulty_signal, fault_type] = add_faults_to_signal(obj, signal, time)
+            faulty_signal = signal;
+            fault_type = FaultTypes.HEALTHY;
+            if obj.use_persistent_faults || rand() <= obj.impulse_probability
+                impulse_signal = generate_impulse(length(signal), obj.random_state);
+                faulty_signal = signal + impulse_signal;
+                fault_type = FaultTypes.IMPULSE;
+            end
+            if obj.use_persistent_faults || rand() <= obj.fault_probability
+                faults = obj.generate_signal(time, [1 1], obj.additional_component_frequency_range);
+                faulty_signal = faulty_signal + faults;
+                specific_fault_type = FaultTypes.ADDITIONAL_COMPONENT;
+                fault_type = update_fault_type(fault_type, specific_fault_type);
+            end
+        end
+    end
+
+    methods (Access = private)
+        function [signal, frequency] = generate_random_signal(obj, time, frequency_range, amplitude_range, phase_range)
+            amplitude = unifrnd(amplitude_range(1), amplitude_range(2));
+            frequency = unifrnd(frequency_range(1), frequency_range(2));
+            theta = unifrnd(phase_range(1), phase_range(2));
+            
+            signal = amplitude * sin(2*pi*frequency*time + theta);
         end
     end
 end

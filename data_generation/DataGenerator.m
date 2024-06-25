@@ -1,30 +1,21 @@
-classdef DataGenerator
+classdef DataGenerator < handle
     properties
         sampling_frequency
         signal_to_noise_ratio  % Signal power x times the noise power
         random_state
     end
-
-    properties (Access = private)
-        impulse_probability
-        fault_probability
-    end
-
+    
     methods
         function obj = DataGenerator(...
             sampling_frequency,...
             signal_to_noise_ratio,...
-            impulse_probability,...
-            fault_probability,...
             random_state...
         )
-            if nargin < 5 || isempty(random_state)
+            if nargin < 3 || isempty(random_state)
                 random_state = [];
             end
             obj.sampling_frequency = sampling_frequency;
             obj.signal_to_noise_ratio = signal_to_noise_ratio;
-            obj.impulse_probability = impulse_probability;
-            obj.fault_probability = fault_probability;
             obj.random_state = random_state;
         end
 
@@ -36,13 +27,6 @@ classdef DataGenerator
             [faulty_signal, fault_type] = obj.add_faults_to_signal(signal, time);
             noisy_and_faulty_signal = obj.add_noise_to_signal(faulty_signal);
         end
-    end
-    
-    methods (Abstract)
-        % Start_time and end_time are assumed to be in seconds
-        dataset = generate_dataset(obj, num_signals, start_time, end_time)
-
-        [faults, specific_fault_type] = generate_specific_faults(obj, time)
     end
 
     methods (Access = private)
@@ -62,23 +46,11 @@ classdef DataGenerator
             end
             noisy_signal = signal + noise;
         end
+    end
 
-        % TODO: here, impulse strength and specific faults should be worse over time!
-        function [faulty_signal, fault_type] = add_faults_to_signal(obj, signal, time, fault_flag)
-            if nargin < 4 || isempty(fault_flag)
-                fault_flag = false;
-            end
-            faulty_signal = signal;
-            fault_type = FaultTypes.HEALTHY;
-            if fault_flag || rand() <= obj.impulse_probability
-                faulty_signal = signal + generate_impulse(length(signal));
-                fault_type = FaultTypes.IMPULSE;
-            end
-            if fault_flag || rand() <= obj.fault_probability
-                [faults, specific_fault_type] = obj.generate_specific_faults(time);
-                faulty_signal = faulty_signal + faults;
-                fault_type = update_fault_type(fault_type, specific_fault_type);
-            end
-        end
+    methods (Abstract)
+        dataset = generate_dataset(obj, num_signals, start_time, end_time) % Start_time and end_time are assumed to be in seconds
+        signal = generate_signal(obj, time)
+        [faults, specific_fault_type] = add_faults_to_signal(obj, signal, time)
     end
 end
