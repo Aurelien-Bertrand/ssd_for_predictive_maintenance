@@ -6,7 +6,7 @@ sampling_frequency = 2560;
 frequency_range = [1 100];
 amplitude_range = [1 5];
 phase_range = [0 1];
-signal_to_noise_ratio = 10;
+signal_to_noise_ratio = 1;
 random_state = []; % You can set this, in which case the signals will always look the same
 intermittent_prob = 0;
 combined_prob = 0;
@@ -14,15 +14,13 @@ allow_intermittent = true;
 allow_combined = true;
 allow_multiple_intermittent = true;
 allow_multiple_combined = true;
-impulse_probability = 0.5;
+
 additional_component_frequency_range = [300 600];
-fault_probability = 0.5;
-random_state = []; % You can set this, in which case the signals will always look the same
 
 % You can load the dataset instead of generating from scratch
 dataset = Dataset.load();
 
-if isempty(dataset)
+if isempty(dataset) || true
     disp("Generating data...")
     generator = SimpleGenerator(...
         num_components_range,...
@@ -37,12 +35,12 @@ if isempty(dataset)
         allow_combined,...
         allow_multiple_intermittent,...
         allow_multiple_combined,...
-        0.5,... % impulse prob
+        0,... % impulse prob
         additional_component_frequency_range,...
-        0.5,... % additional component prob
+        1,... % additional component prob
         random_state...
     );
-    dataset = generator.generate_dataset(40000, 0, 1);
+    dataset = generator.generate_dataset(100, 0, 1);
 
     % Save dataset if needed (including the generator to save its parameters)
     dataset.save();
@@ -50,9 +48,7 @@ if isempty(dataset)
     % Alternatively, we can save the data only
     dataset.save_data();
     
-    % dataset.save_healthy_faulty();
-
-    
+    dataset.save_healthy_faulty();
     
 end
 

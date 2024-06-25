@@ -45,13 +45,13 @@ classdef SimpleGenerator < DataGenerator
             use_persistent_faults...
         )
             if nargin < 13 || isempty(impulse_probability)
-                impulse_probability = 0.2;
+                impulse_probability = 0;
             end
             if nargin < 14 || isempty(additional_component_frequency_range)
                 additional_component_frequency_range = [];
             end 
             if nargin < 15 || isempty(fault_probability)
-                fault_probability = 0.3;
+                fault_probability = 0;
             end
             if nargin < 16
                 random_state = [];
@@ -87,19 +87,22 @@ classdef SimpleGenerator < DataGenerator
             components = cell(num_signals, 1);
             healthy_signals = zeros(num_signals, length(time));
             faulty_signals = zeros(num_signals, length(time));
+            noisy_signals = zeros(num_signals, length(time));
             fault_types = zeros(num_signals, 1);
 
             % parfor i = 1:num_signals
             for i = 1:num_signals
                 [healthy_signal, signal_components] = obj.generate_signal(time);
                 [faulty_signal, fault_type] = obj.add_noise_and_faults_to_signal(healthy_signal, time);
+                noisy_signal = obj.add_just_noise_to_signal(healthy_signal);
 
                 healthy_signals(i, :) = healthy_signal;
                 faulty_signals(i, :) = faulty_signal;
+                noisy_signals(i, :) = noisy_signal;
                 fault_types(i) = fault_type;
                 components{i} = signal_components;
             end
-            dataset = Dataset(obj, time, healthy_signals, faulty_signals, fault_types, components);
+            dataset = Dataset(obj, time, healthy_signals, faulty_signals, noisy_signals, fault_types, components);
         end
 
         function [signal, components] = generate_signal(obj, time, num_components_range, frequency_range)

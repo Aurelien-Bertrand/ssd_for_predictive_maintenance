@@ -1,7 +1,7 @@
 addpath('./singular_spectrum_decomposition/');
 addpath('./plotting/');
-% data = readmatrix('./NeuralNet/data/test.csv');
-data = readmatrix('./experiments/NN_data_noisy.csv');
+data = readmatrix('./NeuralNet/data/test.csv');
+data = readmatrix('./experiments/NN_data_raw.csv');
 p = 100;
 [m, ~] = size(data);
 
@@ -66,5 +66,5 @@ processed_data = processed_data(1:row_index-1, :);
 data_table = array2table(processed_data);
 size(data_table);
 % Save table to CSV file
-path = './experiments/zzz.csv'; 
+path = './experiments/NN_data_decomposed.csv'; 
 writetable(data_table, path);

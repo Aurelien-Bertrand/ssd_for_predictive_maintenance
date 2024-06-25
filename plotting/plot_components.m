@@ -7,6 +7,12 @@ function plot_components(components)
         subplot(11, 1, i);
         plot(t, components(i, :));
         title(['Series ' num2str(i)]);
+    length(components)
+    % Plot each time series
+    for i = 1:size(components, 1)
+        subplot(11, 1, i);  % Create a subplot grid of 10 rows and 1 column, and select the ith subplot
+        plot(t, components(i, :));  % Plot the ith time series
+        title(['Series ' num2str(i)]);  % Title each subplot
         xlabel('Time');
         ylabel('Value');
     end

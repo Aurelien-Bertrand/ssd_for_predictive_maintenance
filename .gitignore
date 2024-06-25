@@ -6,4 +6,6 @@ __pycache__/
 /env
 MaintainNet.ipynb
 utils/client.m
+/_cache
 experiments/NN_data_raw.csv
+/experiments
