@@ -90,18 +90,6 @@ classdef RealisticGenerator < DataGenerator
 
             faulty_signal = signal;
             fault_type = FaultTypes.HEALTHY;
-            if obj.impulse_flag || rand() <= obj.impulse_probability
-                if obj.use_persistent_faults
-                    obj.impulse_flag = true;
-                end
-                impulse_signal = generate_impulse(length(signal), obj.random_state);
-                faulty_signal = signal + impulse_signal;
-                fault_type = FaultTypes.IMPULSE;
-            end
-
-            if obj.use_persistent_faults
-                rng("shuffle")
-            end
             if obj.fault_flag || rand() <= obj.fault_probability
                 if obj.use_persistent_faults
                     obj.fault_flag = true;
@@ -109,6 +97,17 @@ classdef RealisticGenerator < DataGenerator
                 faulty_signal = obj.wind_turbine.generate_signal(time);
                 specific_fault_type = obj.wind_turbine.get_fault_type();
                 fault_type = update_fault_type(fault_type, specific_fault_type);
+            end
+            if obj.use_persistent_faults
+                rng("shuffle")
+            end
+            if obj.impulse_flag || rand() <= obj.impulse_probability
+                if obj.use_persistent_faults
+                    obj.impulse_flag = true;
+                end
+                impulse_signal = generate_impulse(length(signal), obj.random_state);
+                faulty_signal = faulty_signal + impulse_signal;
+                fault_type = FaultTypes.IMPULSE;
             end
         end
     end
