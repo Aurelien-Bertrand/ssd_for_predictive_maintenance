@@ -21,7 +21,7 @@ classdef Dataset
     
     methods
         function obj = Dataset(generator, time, healthy_signals, faulty_signals, noisy_signals, fault_types, components)
-            if nargin < 6
+            if nargin < 7
                 components = [];
             end
             obj.generator = generator;

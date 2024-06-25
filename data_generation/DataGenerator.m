@@ -4,7 +4,7 @@ classdef DataGenerator < handle
         signal_to_noise_ratio  % Signal power x times the noise power
         random_state
     end
-    
+
     methods
         function obj = DataGenerator(...
             sampling_frequency,...
@@ -20,8 +20,7 @@ classdef DataGenerator < handle
         end
 
         function time = generate_time_vector(obj, start_time, end_time)
-            % time = start_time:1/obj.sampling_frequency:end_time;
-            time = linspace(start_time, end_time, 1000);
+            time = start_time:1/obj.sampling_frequency:end_time;
         end
 
         function [noisy_and_faulty_signal, fault_type] = add_noise_and_faults_to_signal(obj, signal, time)
@@ -29,13 +28,6 @@ classdef DataGenerator < handle
             noisy_and_faulty_signal = obj.add_noise_to_signal(faulty_signal);
         end
 
-        function noisy_signal = add_just_noise_to_signal(obj, signal)
-            noisy_signal = obj.add_noise_to_signal(signal);
-        end
-
-    end
-
-    methods (Access = private)
         function noisy_signal = add_noise_to_signal(obj, signal)
             if obj.signal_to_noise_ratio == 0
                 noisy_signal = signal;

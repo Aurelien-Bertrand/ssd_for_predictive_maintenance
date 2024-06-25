@@ -7,7 +7,6 @@ frequency_range = [1 100];
 amplitude_range = [1 5];
 phase_range = [0 1];
 signal_to_noise_ratio = 10;
-random_state = []; % You can set this, in which case the signals will always look the same
 intermittent_prob = 0;
 combined_prob = 0;
 allow_intermittent = true;
@@ -37,12 +36,12 @@ if isempty(dataset)
         allow_combined,...
         allow_multiple_intermittent,...
         allow_multiple_combined,...
-        0.5,... % impulse prob
+        impulse_probability,...
         additional_component_frequency_range,...
-        0.5,... % additional component prob
+        fault_probability,...
         random_state...
     );
-    dataset = generator.generate_dataset(40000, 0, 1);
+    dataset = generator.generate_dataset(10, 0, 1);
 
     % Save dataset if needed (including the generator to save its parameters)
     dataset.save();
@@ -50,10 +49,8 @@ if isempty(dataset)
     % Alternatively, we can save the data only
     dataset.save_data();
     
-    % dataset.save_healthy_faulty();
-
-    
-    
+    % Or we can also save only healthy / faulty data
+    dataset.save_healthy_faulty();
 end
 
 dataset.plot()

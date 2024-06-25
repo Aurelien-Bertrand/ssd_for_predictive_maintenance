@@ -26,6 +26,9 @@ if isempty(dataset)
 
     % Alternatively, we can save the data only
     dataset.save_data()
+
+    % Or we can also save only healthy / faulty data
+    dataset.save_healthy_faulty();
 end
 
 dataset.plot()

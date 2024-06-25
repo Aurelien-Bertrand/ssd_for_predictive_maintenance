@@ -60,18 +60,21 @@ classdef RealisticGenerator < DataGenerator
             time = obj.generate_time_vector(start_time, end_time);
             healthy_signals = zeros(num_signals, length(time));
             faulty_signals = zeros(num_signals, length(time));
+            noisy_signals = zeros(num_signals, length(time));
             fault_types = zeros(num_signals, 1);
 
             % parfor i = 1:num_signals
             for i = 1:num_signals
                 healthy_signal = obj.generate_signal(time);
                 [faulty_signal, fault_type] = obj.add_noise_and_faults_to_signal(healthy_signal, time);
+                noisy_signal = obj.add_noise_to_signal(healthy_signal);
 
                 healthy_signals(i, :) = healthy_signal;
                 faulty_signals(i, :) = faulty_signal;
+                noisy_signals(i, :) = noisy_signal;
                 fault_types(i) = fault_type;
             end
-            dataset = Dataset(obj, time, healthy_signals, faulty_signals, fault_types);
+            dataset = Dataset(obj, time, healthy_signals, faulty_signals, noisy_signals, fault_types);
         end
 
         function signal = generate_signal(obj, time)

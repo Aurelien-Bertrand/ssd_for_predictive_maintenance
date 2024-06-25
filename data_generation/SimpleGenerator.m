@@ -78,11 +78,7 @@ classdef SimpleGenerator < DataGenerator
             obj.use_persistent_faults = use_persistent_faults;
         end
 
-        function dataset = generate_dataset(obj, num_signals, start_time, end_time, fault_flag)
-            if nargin < 5 || isempty(fault_flag)
-                fault_flag = false;
-            end
-
+        function dataset = generate_dataset(obj, num_signals, start_time, end_time)
             time = obj.generate_time_vector(start_time, end_time);
             components = cell(num_signals, 1);
             healthy_signals = zeros(num_signals, length(time));
@@ -94,7 +90,7 @@ classdef SimpleGenerator < DataGenerator
             for i = 1:num_signals
                 [healthy_signal, signal_components] = obj.generate_signal(time);
                 [faulty_signal, fault_type] = obj.add_noise_and_faults_to_signal(healthy_signal, time);
-                noisy_signal = obj.add_just_noise_to_signal(healthy_signal);
+                noisy_signal = obj.add_noise_to_signal(healthy_signal);
 
                 healthy_signals(i, :) = healthy_signal;
                 faulty_signals(i, :) = faulty_signal;
