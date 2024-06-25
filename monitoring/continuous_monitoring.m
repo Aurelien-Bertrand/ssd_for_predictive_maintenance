@@ -22,7 +22,7 @@ for i = 1:WINDOW_SIZE:length(time)-WINDOW_SIZE+1
     start_time = window_time(1);
     end_time = window_time(end);
     
-    data = generator.generate_dataset(1, start_time, end_time, fault_flag);
+    data = generator.generate_dataset(1, start_time, end_time);
     fault = string(model.predict(data.faulty_signals));
 
     disp(['Window Start Time: ' secondsToHMS(start_time) ', End Time: ' secondsToHMS(end_time) ', Predicted fault: ' fault]);
