@@ -27,7 +27,7 @@ classdef RealisticGenerator < DataGenerator
             use_persistent_faults...
         )
             if nargin < 3 || isempty(range_n_teeth)
-                range_n_teeth = [90 130]; % TODO: mention this in report, this is assumed!
+                range_n_teeth = [90 130];
             end
             if nargin < 4 || isempty(impulse_probability)
                 impulse_probability = 0.01;
