@@ -25,7 +25,7 @@ class MaintainNetSSD(nn.Module):
 
         # Define convolutional layers
         self.conv_layers = nn.ModuleList([
-            nn.Conv1d(in_channels=7, out_channels=16, kernel_size=64, padding=32),  # Initial layer for multiple channels
+            nn.Conv1d(in_channels=11, out_channels=16, kernel_size=64, padding=32),  # Initial layer for multiple channels
             nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, padding=1),
             nn.Conv1d(in_channels=32, out_channels=64, kernel_size=3, padding=1),
             nn.Conv1d(in_channels=64, out_channels=64, kernel_size=3, padding=1),
@@ -279,7 +279,7 @@ class SignalDataset(Dataset):
     def __getitem__(self, idx):
         signal_id = self.signal_ids[idx]
         id_data = self.dataframe.loc[signal_id]
-        signal_data = id_data.values[:,:-1]  # Extract the 10 rows of components
+        signal_data = id_data.values[:,:-1]  # Extract the rows of components
         target = id_data.iloc[-1,-1]  # Extract the target
 
         # Normalize the signal data to be between -1 and 1

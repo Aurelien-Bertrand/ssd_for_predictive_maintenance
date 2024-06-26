@@ -3,10 +3,13 @@ addpath('./plotting/');
 
 data_healthy = readmatrix('./experiments/simple/Noise0/fault_impulse/data_healthy.csv');
 data_faulty = readmatrix('./experiments/simple/Noise0/fault_impulse/data_faulty.csv');
-% data = readmatrix('./experiments/simple/Noise10/fault_extra/data_noisy.csv');
-% data = readmatrix('./experiments/simple/Noise10/fault_extra/data_faulty.csv');
+% data_healthy = readmatrix('./experiments/simple/Noise0/fault_extra/data_healthy.csv');
+% data_faulty = readmatrix('./experiments/simple/Noise0/fault_extra/data_faulty.csv');
+% data_healthy = readmatrix('./experiments/simple/Noise10/fault_extra/data_noisy.csv');
+% data_faulty = readmatrix('./experiments/simple/Noise10/fault_extra/data_faulty.csv');
 
 
+% Impulses using 5
 i = 5;
 
 signal_healthy = data_healthy(i, 1:1000);  % Extract the ith signal (row)

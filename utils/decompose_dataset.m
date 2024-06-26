@@ -1,7 +1,7 @@
 addpath('./singular_spectrum_decomposition/');
 addpath('./plotting/');
 % data = readmatrix('./NeuralNet/data/test.csv');
-data = readmatrix('./experiments/NN_data_noisy.csv');
+data = readmatrix('./experiments/NN/noise1/data_faulty.csv');
 p = 100;
 [m, ~] = size(data);
 
@@ -23,7 +23,7 @@ for i = 1:m
     
         % Do SSD decomposition
         % signal_components = SSD(signal, 1000, 0.01, 10);
-        signal_components = rSSD(signal, 1000, 0.01, 6);
+        signal_components = rSSD(signal, 1000, 0.01, 10);
     
         % Find the residual
         sum_components = sum(signal_components, 1);  % Sum all the components
@@ -66,5 +66,5 @@ processed_data = processed_data(1:row_index-1, :);
 data_table = array2table(processed_data);
 size(data_table);
 % Save table to CSV file
-path = './experiments/zzz.csv'; 
+path = './experiments/NN/noise1/zzz.csv'; 
 writetable(data_table, path);
