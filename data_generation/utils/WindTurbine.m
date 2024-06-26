@@ -1,6 +1,5 @@
 classdef WindTurbine < handle
-    % This generator simulates vibration signals in a specific gearbox of a wind turbine
-    % TODO: mention what wind turbine it is!
+    % This generator simulates vibration signals in a specific gearbox of a wind turbine, see report for specific details
     properties (Access = private, Constant)
         NUM_HARMONICS = 3
 
