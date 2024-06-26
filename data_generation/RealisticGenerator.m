@@ -85,12 +85,12 @@ classdef RealisticGenerator < DataGenerator
         end
 
         function [faulty_signal, fault_type] = add_faults_to_signal(obj, signal, time)
+            faulty_signal = signal;
+            fault_type = FaultTypes.HEALTHY;
+            
             if obj.use_persistent_faults
                 rng("shuffle")
             end
-
-            faulty_signal = signal;
-            fault_type = FaultTypes.HEALTHY;
             if obj.fault_flag || rand() <= obj.fault_probability
                 if obj.use_persistent_faults
                     obj.fault_flag = true;

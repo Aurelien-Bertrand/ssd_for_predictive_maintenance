@@ -160,6 +160,10 @@ classdef SimpleGenerator < DataGenerator
         function [faulty_signal, fault_type] = add_faults_to_signal(obj, signal, time)
             faulty_signal = signal;
             fault_type = FaultTypes.HEALTHY;
+
+            if obj.use_persistent_faults
+                rng("shuffle")
+            end
             if obj.use_persistent_faults || rand() <= obj.impulse_probability
                 [impulse_signal, impulse_strength] = generate_impulse(length(signal), obj.random_state, obj.impulse_strength);
                 if obj.use_persistent_faults
@@ -167,6 +171,9 @@ classdef SimpleGenerator < DataGenerator
                 end
                 faulty_signal = signal + impulse_signal;
                 fault_type = FaultTypes.IMPULSE;
+            end
+            if obj.use_persistent_faults
+                rng("shuffle")
             end
             if obj.use_persistent_faults || rand() <= obj.fault_probability
                 [faults, ~, frequency] = obj.generate_signal(time, [1 1], obj.additional_component_frequency_range);
