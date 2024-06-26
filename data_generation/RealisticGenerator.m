@@ -63,7 +63,6 @@ classdef RealisticGenerator < DataGenerator
             noisy_signals = zeros(num_signals, length(time));
             fault_types = zeros(num_signals, 1);
 
-            % parfor i = 1:num_signals
             for i = 1:num_signals
                 healthy_signal = obj.generate_signal(time);
                 [faulty_signal, fault_type] = obj.add_noise_and_faults_to_signal(healthy_signal, time);
@@ -107,7 +106,8 @@ classdef RealisticGenerator < DataGenerator
                 end
                 impulse_signal = generate_impulse(length(signal), obj.random_state);
                 faulty_signal = faulty_signal + impulse_signal;
-                fault_type = FaultTypes.IMPULSE;
+                specific_fault_type = FaultTypes.IMPULSE;
+                fault_type = update_fault_type(fault_type, specific_fault_type);
             end
         end
     end

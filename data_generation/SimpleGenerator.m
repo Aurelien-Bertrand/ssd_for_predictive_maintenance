@@ -86,7 +86,6 @@ classdef SimpleGenerator < DataGenerator
             noisy_signals = zeros(num_signals, length(time));
             fault_types = zeros(num_signals, 1);
 
-            % parfor i = 1:num_signals
             for i = 1:num_signals
                 [healthy_signal, signal_components] = obj.generate_signal(time);
                 [faulty_signal, fault_type] = obj.add_noise_and_faults_to_signal(healthy_signal, time);
