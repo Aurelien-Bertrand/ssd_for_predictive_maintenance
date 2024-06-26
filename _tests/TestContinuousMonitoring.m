@@ -1,5 +1,3 @@
-% TODO: test both generators in terms of continuous monitoring
-% Faults should remains and amplify!
 classdef TestContinuousMonitoring < matlab.unittest.TestCase
     properties
         num_components_range
@@ -45,7 +43,7 @@ classdef TestContinuousMonitoring < matlab.unittest.TestCase
             testCase.random_state = 101;
             testCase.range_n_teeth = [90 100];
             testCase.use_persistent_faults = true;
-            testCase.num_windows = 10;
+            testCase.num_windows = 20;
         end
     end
     
@@ -54,7 +52,6 @@ classdef TestContinuousMonitoring < matlab.unittest.TestCase
             [start_times, end_times] = testCase.generate_time_windows();
             previous_additional_component_frequency_range = [];
             previous_impulse_strength = 0;
-
             generator = SimpleGenerator(...
                 testCase.num_components_range,...
                 testCase.sampling_frequency,...
