@@ -65,4 +65,8 @@ Whenever running the code, users may have troubles running the code as it is. We
 It should be all good now! Enjoy running the project :D
 
 ## Contact
-Should you have any question regarding the code, feel free to contact me at a.aurelien@student.maastrichtuniversity.nl.
+Should you have any question regarding the code, feel free to contact us at:
+- a.aurelien@student.maastrichtuniversity.nl.
+- a.khalak@student.maastrichtuniversity.nl
+- Jjvp.maes@student.maastrichtuniversity.nl
+- b.vangool@student.maastrichtuniversity.nl
