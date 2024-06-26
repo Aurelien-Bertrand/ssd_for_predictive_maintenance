@@ -14,7 +14,7 @@ classdef WindTurbine < handle
         random_state
     end
 
-    properties (Access = private)
+    properties (SetAccess = private)
         dynamic_update
         A
         B

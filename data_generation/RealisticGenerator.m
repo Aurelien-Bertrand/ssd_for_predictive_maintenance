@@ -10,7 +10,7 @@ classdef RealisticGenerator < DataGenerator
         wind_turbine
     end
 
-    properties (Access = private)
+    properties (SetAccess = private)
         use_persistent_faults
         impulse_flag
         fault_flag
