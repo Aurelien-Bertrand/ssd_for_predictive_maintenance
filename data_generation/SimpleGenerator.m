@@ -20,7 +20,7 @@ classdef SimpleGenerator < DataGenerator
         fault_probability
     end
 
-    properties (Access = private)
+    properties (SetAccess = private)
         use_persistent_faults
         impulse_strength
     end
@@ -89,7 +89,7 @@ classdef SimpleGenerator < DataGenerator
             fault_types = zeros(num_signals, 1);
 
             for i = 1:num_signals
-                [healthy_signal, signal_components] = obj.generate_signal(time);
+                [healthy_signal, signal_components, ~] = obj.generate_signal(time);
                 [faulty_signal, fault_type] = obj.add_noise_and_faults_to_signal(healthy_signal, time);
                 noisy_signal = obj.add_noise_to_signal(healthy_signal);
 
@@ -102,7 +102,7 @@ classdef SimpleGenerator < DataGenerator
             dataset = Dataset(obj, time, healthy_signals, faulty_signals, noisy_signals, fault_types, components);
         end
 
-        function [signal, components] = generate_signal(obj, time, num_components_range, frequency_range)
+        function [signal, components, frequencies] = generate_signal(obj, time, num_components_range, frequency_range)
             if nargin < 3 || isempty(num_components_range)
                 num_components_range = obj.num_components_range;
             end
@@ -139,7 +139,7 @@ classdef SimpleGenerator < DataGenerator
                     end
                 end
                 if generate_combined
-                    frequency_range = [new_freq_hz * (1 - obj.MAX_NARROW_FREQUENCY_DIFFERENCE), new_freq_hz * (1 + obj.MAX_NARROW_FREQUENCY_DIFFERENCE)];
+                    frequency_range = [max(new_freq_hz * (1 - obj.MAX_NARROW_FREQUENCY_DIFFERENCE), frequency_range(1)), min(new_freq_hz * (1 + obj.MAX_NARROW_FREQUENCY_DIFFERENCE), frequency_range(2))];
                     [additional_component, additional_freq] = obj.generate_random_signal(time, frequency_range, obj.amplitude_range, obj.phase_range);
                     component = component + additional_component;
                     current_frequencies = [current_frequencies; additional_freq];
@@ -169,7 +169,9 @@ classdef SimpleGenerator < DataGenerator
                 fault_type = FaultTypes.IMPULSE;
             end
             if obj.use_persistent_faults || rand() <= obj.fault_probability
-                faults = obj.generate_signal(time, [1 1], obj.additional_component_frequency_range);
+                [faults, ~, frequency] = obj.generate_signal(time, [1 1], obj.additional_component_frequency_range);
+                obj.additional_component_frequency_range(1) = frequency;
+                
                 faulty_signal = faulty_signal + faults;
                 specific_fault_type = FaultTypes.ADDITIONAL_COMPONENT;
                 fault_type = update_fault_type(fault_type, specific_fault_type);
