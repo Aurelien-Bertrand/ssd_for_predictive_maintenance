@@ -13,6 +13,18 @@ function fault_type = update_fault_type(previous_fault_type, new_fault_type)
         elseif new_fault_type == FaultTypes.HEALTHY
             fault_type = FaultTypes.IMPULSE;
         end
+    elseif previous_fault_type == FaultTypes.FREQUENCY_MODULATION
+        if new_fault_type == FaultTypes.IMPULSE
+            fault_type = FaultTypes.IMPULSE_AND_FREQUENCY_MODULATION;
+        end
+    elseif previous_fault_type == FaultTypes.AMPLITUDE_MODULATION
+        if new_fault_type == FaultTypes.IMPULSE
+            fault_type = FaultTypes.IMPULSE_AND_AMPLITUDE_MODULATION;
+        end
+    elseif previous_fault_type == FaultTypes.FREQUENCY_AND_AMPLITUDE_MODULATION
+        if new_fault_type == FaultTypes.IMPULSE
+            fault_type = FaultTypes.IMPULSE_AND_FREQUENCY_AND_AMPLITUDE_MODULATION;
+        end
     else
         error("Faut type %s not suported", previous_fault_type)
     end
