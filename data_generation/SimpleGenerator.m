@@ -170,8 +170,9 @@ classdef SimpleGenerator < DataGenerator
             end
             if obj.use_persistent_faults || rand() <= obj.fault_probability
                 [faults, ~, frequency] = obj.generate_signal(time, [1 1], obj.additional_component_frequency_range);
-                obj.additional_component_frequency_range(1) = frequency;
-                
+                if obj.use_persistent_faults
+                    obj.additional_component_frequency_range(1) = frequency;
+                end
                 faulty_signal = faulty_signal + faults;
                 specific_fault_type = FaultTypes.ADDITIONAL_COMPONENT;
                 fault_type = update_fault_type(fault_type, specific_fault_type);

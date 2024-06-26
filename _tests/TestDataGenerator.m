@@ -20,6 +20,7 @@ classdef TestDataGenerator < matlab.unittest.TestCase
         start_time
         end_time
         use_persistent_faults
+        time
     end
     
     methods(TestMethodSetup)
@@ -44,6 +45,7 @@ classdef TestDataGenerator < matlab.unittest.TestCase
             testCase.start_time = 0;
             testCase.end_time = 1;
             testCase.use_persistent_faults = false;
+            testCase.time = testCase.start_time:1/testCase.sampling_frequency:testCase.end_time;
         end
     end
     
@@ -70,6 +72,24 @@ classdef TestDataGenerator < matlab.unittest.TestCase
             actual_dataset = generator.generate_dataset(1, testCase.start_time, testCase.end_time);
             expected_dataset = Dataset.load("./_tests/_cache/simple_dataset.mat");
 
+            testCase.verifyEqual(generator.num_components_range, testCase.num_components_range)
+            testCase.verifyEqual(generator.sampling_frequency, testCase.sampling_frequency)
+            testCase.verifyEqual(generator.frequency_range, testCase.frequency_range)
+            testCase.verifyEqual(generator.amplitude_range, testCase.amplitude_range)
+            testCase.verifyEqual(generator.phase_range, testCase.phase_range)
+            testCase.verifyEqual(generator.signal_to_noise_ratio, testCase.signal_to_noise_ratio)
+            testCase.verifyEqual(generator.intermittent_prob, testCase.intermittent_prob)
+            testCase.verifyEqual(generator.combined_prob, testCase.combined_prob)
+            testCase.verifyEqual(generator.allow_intermittent, testCase.allow_intermittent)
+            testCase.verifyEqual(generator.allow_combined, testCase.allow_combined)
+            testCase.verifyEqual(generator.allow_multiple_intermittent, testCase.allow_multiple_intermittent)
+            testCase.verifyEqual(generator.allow_multiple_combined, testCase.allow_multiple_combined)
+            testCase.verifyEqual(generator.impulse_probability, testCase.impulse_probability)
+            testCase.verifyEqual(generator.additional_component_frequency_range, testCase.additional_component_frequency_range)
+            testCase.verifyEqual(generator.fault_probability, testCase.fault_probability)
+            testCase.verifyEqual(generator.random_state, testCase.random_state)
+            testCase.verifyEqual(generator.use_persistent_faults, testCase.use_persistent_faults)
+
             testCase.verifyDatasetsEqual(actual_dataset, expected_dataset);
         end
 
@@ -85,6 +105,14 @@ classdef TestDataGenerator < matlab.unittest.TestCase
             );
             actual_dataset = generator.generate_dataset(1, testCase.start_time, testCase.end_time);
             expected_dataset = Dataset.load("./_tests/_cache/realistic_dataset.mat");
+
+            testCase.verifyEqual(generator.sampling_frequency, testCase.sampling_frequency)
+            testCase.verifyEqual(generator.signal_to_noise_ratio, testCase.signal_to_noise_ratio)
+            testCase.verifyEqual(generator.range_n_teeth, testCase.range_n_teeth)
+            testCase.verifyEqual(generator.impulse_probability, testCase.impulse_probability)
+            testCase.verifyEqual(generator.fault_probability, testCase.fault_probability)
+            testCase.verifyEqual(generator.random_state, testCase.random_state)
+            testCase.verifyEqual(generator.use_persistent_faults, testCase.use_persistent_faults)
             
             testCase.verifyDatasetsEqual(actual_dataset, expected_dataset);
         end
@@ -104,6 +132,8 @@ classdef TestDataGenerator < matlab.unittest.TestCase
                 "Fault types do not match.");
             testCase.verifyEqual(actual_dataset.components, expected_dataset.components, ...
                 "Components do not match.");
+            testCase.verifyEqual(actual_dataset.time, testCase.time, ...
+                "Time vectors do not match.");
         end
     end
 end

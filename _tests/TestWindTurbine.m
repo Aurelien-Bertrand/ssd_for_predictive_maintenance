@@ -39,6 +39,7 @@ classdef TestWindTurbine < matlab.unittest.TestCase
             testCase.verifyEqual(wind_turbine.carrier_frequency, testCase.carrier_frequency);
             testCase.verifyEqual(wind_turbine.system_frequencies, testCase.EXPECTED_SYSTEM_FREQUENCIES, "AbsTol", 1e-4);
             testCase.verifyEqual(wind_turbine.number_of_teeth_by_gear, testCase.EXPECTED_N_TEETH_BY_GEAR);
+            testCase.verifyEqual(wind_turbine.dynamic_update, testCase.dynamic_update)
         end
     end
 end
