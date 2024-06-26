@@ -7,8 +7,8 @@ frequency_range = [1 100];
 amplitude_range = [1 5];
 phase_range = [0 1];
 signal_to_noise_ratio = 10;
-intermittent_prob = 0;
-combined_prob = 0;
+intermittent_prob = 0.33;
+combined_prob = 0.33;
 allow_intermittent = true;
 allow_combined = true;
 allow_multiple_intermittent = true;
@@ -41,7 +41,7 @@ if isempty(dataset)
         fault_probability,...
         random_state...
     );
-    dataset = generator.generate_dataset(10, 0, 1);
+    dataset = generator.generate_dataset(10, 0, 10);
 
     % Save dataset if needed (including the generator to save its parameters)
     dataset.save();
