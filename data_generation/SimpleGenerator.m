@@ -22,6 +22,7 @@ classdef SimpleGenerator < DataGenerator
 
     properties (Access = private)
         use_persistent_faults
+        impulse_strength
     end
 
     methods
@@ -76,6 +77,7 @@ classdef SimpleGenerator < DataGenerator
             obj.impulse_probability = impulse_probability;
             obj.fault_probability = fault_probability;
             obj.use_persistent_faults = use_persistent_faults;
+            obj.impulse_strength = 0;
         end
 
         function dataset = generate_dataset(obj, num_signals, start_time, end_time)
@@ -159,7 +161,10 @@ classdef SimpleGenerator < DataGenerator
             faulty_signal = signal;
             fault_type = FaultTypes.HEALTHY;
             if obj.use_persistent_faults || rand() <= obj.impulse_probability
-                impulse_signal = generate_impulse(length(signal), obj.random_state);
+                [impulse_signal, impulse_strength] = generate_impulse(length(signal), obj.random_state, obj.impulse_strength);
+                if obj.use_persistent_faults
+                    obj.impulse_strength = impulse_strength;
+                end
                 faulty_signal = signal + impulse_signal;
                 fault_type = FaultTypes.IMPULSE;
             end

@@ -1,9 +1,14 @@
-function impulse_signal = generate_impulse(n, random_state)
+function [impulse_signal, impulse_strength] = generate_impulse(n, random_state, impulse_strength)
     if ~isempty(random_state)
         rng(random_state);
     end
-
-    impulse_strength = unifrnd(0, 10);
+    
+    if impulse_strength == 0
+        upper_bound_impulse_strength = 10;
+    else
+        upper_bound_impulse_strength = impulse_strength + (10 - impulse_strength) * 0.2 * rand();
+    end
+    impulse_strength = unifrnd(impulse_strength, upper_bound_impulse_strength);
 
     step_size = randi([floor(n / 30), floor(n / 15)]);
 

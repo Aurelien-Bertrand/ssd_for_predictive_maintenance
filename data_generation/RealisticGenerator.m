@@ -10,10 +10,11 @@ classdef RealisticGenerator < DataGenerator
         wind_turbine
     end
 
-    properties (SetAccess = private)
+    properties (Access = private)
         use_persistent_faults
         impulse_flag
         fault_flag
+        impulse_strength
     end
 
     methods
@@ -50,6 +51,7 @@ classdef RealisticGenerator < DataGenerator
             obj.wind_turbine = [];
             obj.impulse_flag = false;
             obj.fault_flag = false;
+            obj.impulse_strength = 0;
 
             if ~isempty(obj.random_state)
                 rng(obj.random_state);
@@ -104,7 +106,10 @@ classdef RealisticGenerator < DataGenerator
                 if obj.use_persistent_faults
                     obj.impulse_flag = true;
                 end
-                impulse_signal = generate_impulse(length(signal), obj.random_state);
+                [impulse_signal, impulse_strength] = generate_impulse(length(signal), obj.random_state, obj.impulse_strength);
+                if obj.use_persistent_faults
+                    obj.impulse_strength = impulse_strength;
+                end
                 faulty_signal = faulty_signal + impulse_signal;
                 specific_fault_type = FaultTypes.IMPULSE;
                 fault_type = update_fault_type(fault_type, specific_fault_type);
