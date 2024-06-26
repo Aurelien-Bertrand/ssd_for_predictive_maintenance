@@ -70,3 +70,4 @@ Should you have any question regarding the code, feel free to contact us at:
 - a.khalak@student.maastrichtuniversity.nl
 - Jjvp.maes@student.maastrichtuniversity.nl
 - b.vangool@student.maastrichtuniversity.nl
+- r.langrock@student.maastrichtuniversity.nl
