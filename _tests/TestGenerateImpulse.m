@@ -1,22 +1,24 @@
 classdef TestGenerateImpulse < matlab.unittest.TestCase
     properties
-        length
+        n
         random_state
+        impulse_strength
     end
 
     methods(TestMethodSetup)
         function setUp(testCase)
-            testCase.length = 300;
+            testCase.n = 300;
             testCase.random_state = 101;
+            testCase.impulse_strength = 0;
         end
     end
 
     methods(Test)
         function testImpulseSignal(testCase)
-            actual_impulse = generate_impulse(testCase.length, testCase.random_state);
+            actual_impulse = generate_impulse(testCase.n, testCase.random_state, testCase.impulse_strength);
             expected_impulse = load("./_tests/_cache/impulse_signal.mat").impulse;
 
-            testCase.verifyEqual(length(actual_impulse), testCase.length, ...
+            testCase.verifyEqual(length(actual_impulse), testCase.n, ...
                 "The length of the impulse signal does not match.");
 
             actual_impulse_strength = max(actual_impulse);
