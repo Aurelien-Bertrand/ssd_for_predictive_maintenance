@@ -91,7 +91,7 @@ classdef RealisticGenerator < DataGenerator
             if obj.use_persistent_faults
                 rng("shuffle")
             end
-            if obj.fault_flag || rand() <= obj.fault_probability
+            if obj.fault_flag || rand() < obj.fault_probability
                 if obj.use_persistent_faults
                     obj.fault_flag = true;
                 end
@@ -102,7 +102,7 @@ classdef RealisticGenerator < DataGenerator
             if obj.use_persistent_faults
                 rng("shuffle")
             end
-            if obj.impulse_flag || rand() <= obj.impulse_probability
+            if obj.impulse_flag || rand() < obj.impulse_probability
                 if obj.use_persistent_faults
                     obj.impulse_flag = true;
                 end
