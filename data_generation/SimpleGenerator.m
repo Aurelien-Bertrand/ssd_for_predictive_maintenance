@@ -164,7 +164,7 @@ classdef SimpleGenerator < DataGenerator
             if obj.use_persistent_faults
                 rng("shuffle")
             end
-            if obj.use_persistent_faults || rand() <= obj.impulse_probability
+            if obj.use_persistent_faults || rand() < obj.impulse_probability
                 [impulse_signal, impulse_strength] = generate_impulse(length(signal), obj.random_state, obj.impulse_strength);
                 if obj.use_persistent_faults
                     obj.impulse_strength = impulse_strength;
@@ -175,7 +175,7 @@ classdef SimpleGenerator < DataGenerator
             if obj.use_persistent_faults
                 rng("shuffle")
             end
-            if obj.use_persistent_faults || rand() <= obj.fault_probability
+            if obj.use_persistent_faults || rand() < obj.fault_probability
                 [faults, ~, frequency] = obj.generate_signal(time, [1 1], obj.additional_component_frequency_range);
                 if obj.use_persistent_faults
                     obj.additional_component_frequency_range(1) = frequency;
