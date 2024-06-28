@@ -11,7 +11,7 @@ function [numOfComps_sig,meanPComp_sig,varPComp_sig,stftPComp_sig,freqs,faultDet
         meanRes_sig = NaN(1,1); % mean of residual
         varRes_sig = NaN(1,1); % variance of residual
         stftRes_sig = cell(1,1); % stft of residual
-        faultDetectFlags = [];
+        faultDetectFlags = [""];
         numOfComps_sig = [];
 
         [m,n] = size(signal);
@@ -78,7 +78,7 @@ function [numOfComps_sig,meanPComp_sig,varPComp_sig,stftPComp_sig,freqs,faultDet
             % if fault detection is activated, get the response
             % from the NN
             if getFaultDetection
-                faultDetectFlags(k) = faultDetectionWindow(data);
+                faultDetectFlags(k) = string(faultDetectionWindow(data));
             end
                        
         end
